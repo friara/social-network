@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "Users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +22,6 @@ public class User implements UserDetails {
 
     private String login;
     private String password;
-    //private String role;
     private String lastName;
     private String firstName;
     private String patronymic;
@@ -38,11 +38,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Booking> bookings;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<File> files;
-
     @ManyToOne
-    @JoinColumn(name = "role")
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @Override

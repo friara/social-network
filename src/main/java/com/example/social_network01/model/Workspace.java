@@ -18,4 +18,6 @@ public class Workspace {
 
     @OneToMany(mappedBy = "workspace")
     private List<Booking> bookings;
+
+    
 }
