@@ -1,7 +1,7 @@
 package com.example.social_network01.controller;
 
-import com.example.social_network01.model.Like;
-import com.example.social_network01.repository.LikeRepository;
+import com.example.social_network01.dto.LikeDTO;
+import com.example.social_network01.service.like.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,32 +13,31 @@ import java.util.List;
 public class LikeController {
 
     @Autowired
-    private LikeRepository likeRepository;
+    private LikeService likeService;
+
+    @PostMapping
+    public LikeDTO createLike(@RequestBody LikeDTO likeDTO) {
+        return likeService.createLike(likeDTO);
+    }
 
     @GetMapping
-    public List<Like> getAllLikes() {
-        return likeRepository.findAll();
+    public List<LikeDTO> getAllLikes() {
+        return likeService.getAllLikes();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Like> getLikeById(@PathVariable Long id) {
-        return likeRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public Like createLike(@RequestBody Like like) {
-        return likeRepository.save(like);
+    public ResponseEntity<LikeDTO> getLikeById(@PathVariable Long id) {
+        LikeDTO likeDTO = likeService.getLikeById(id);
+        if (likeDTO != null) {
+            return ResponseEntity.ok(likeDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLike(@PathVariable Long id) {
-        return likeRepository.findById(id)
-                .map(like -> {
-                    likeRepository.delete(like);
-                    return ResponseEntity.ok().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        likeService.deleteLike(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,9 +1,4 @@
-package com.example.social_network01.service;
-
-import com.example.social_network01.model.User;
-import com.example.social_network01.repository.UserRepository;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.userdetails.*;
+package com.example.social_network01.service.user;
 
 //@Bean
 //public UserDetailsService userDetailsService(UserRepository userRepo) {

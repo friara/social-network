@@ -1,7 +1,7 @@
 package com.example.social_network01.controller;
 
-import com.example.social_network01.model.Repost;
-import com.example.social_network01.repository.RepostRepository;
+import com.example.social_network01.dto.RepostDTO;
+import com.example.social_network01.service.repost.RepostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,32 +13,31 @@ import java.util.List;
 public class RepostController {
 
     @Autowired
-    private RepostRepository repostRepository;
+    private RepostService repostService;
+
+    @PostMapping
+    public RepostDTO createRepost(@RequestBody RepostDTO repostDTO) {
+        return repostService.createRepost(repostDTO);
+    }
 
     @GetMapping
-    public List<Repost> getAllReposts() {
-        return repostRepository.findAll();
+    public List<RepostDTO> getAllReposts() {
+        return repostService.getAllReposts();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Repost> getRepostById(@PathVariable Long id) {
-        return repostRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public Repost createRepost(@RequestBody Repost repost) {
-        return repostRepository.save(repost);
+    public ResponseEntity<RepostDTO> getRepostById(@PathVariable Long id) {
+        RepostDTO repostDTO = repostService.getRepostById(id);
+        if (repostDTO != null) {
+            return ResponseEntity.ok(repostDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRepost(@PathVariable Long id) {
-        return repostRepository.findById(id)
-                .map(repost -> {
-                    repostRepository.delete(repost);
-                    return ResponseEntity.ok().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        repostService.deleteRepost(id);
+        return ResponseEntity.noContent().build();
     }
 }
