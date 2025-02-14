@@ -3,8 +3,11 @@ package com.example.social_network01.service.user;
 import com.example.social_network01.dto.UserDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.repository.UserRepository;
+import com.example.social_network01.service.user.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +39,22 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserById(Long id) {
         return userRepository.findById(id)
                 .map(user -> modelMapper.map(user, UserDTO.class))
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        modelMapper.map(userDTO, User.class);
+        user.setLogin(userDTO.getLogin());
+        user.setLastName(userDTO.getLastName());
+        user.setFirstName(userDTO.getFirstName());
+        user.setPatronymic(userDTO.getPatronymic());
+        user.setAppointment(userDTO.getAppointment());
+        user.setBirthday(userDTO.getBirthday());
+        user.setAvatarPath(userDTO.getAvatarUrl());
+        return modelMapper.map(userRepository.save(user), UserDTO.class);
     }
 
     @Override
@@ -44,8 +62,4 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    @Override
-    public UserDTO findByLogin(String login) {
-        return modelMapper.map(userRepository.findByLogin(login), UserDTO.class);
-    }
 }

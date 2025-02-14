@@ -21,7 +21,6 @@ public class Post {
 
     private String title;
     private String text;
-    private String imageName;
 
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;
@@ -73,14 +72,6 @@ public class Post {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public String getImageName() {
-        return imageName;
-    }
-
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
     }
 
     public List<Comment> getComments() {

@@ -13,5 +13,5 @@ public class UserDTO {
     private String patronymic;
     private String appointment;
     private LocalDate birthday;
-    private String avatarPath;
+    private String avatarUrl;
 }

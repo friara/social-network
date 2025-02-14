@@ -5,6 +5,7 @@ import com.example.social_network01.service.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,8 +17,17 @@ public class PostController {
     private PostService postService;
 
     @PostMapping
-    public PostDTO createPost(@RequestBody PostDTO postDTO) {
-        return postService.createPost(postDTO);
+    public PostDTO createPost(
+            @RequestParam("title") String title,
+            @RequestParam("text") String text,
+            @RequestParam("files") List<MultipartFile> files) {
+        return postService.createPost(title, text, files);
+    }
+    @PutMapping("/{id}")
+    public PostDTO updatePost(
+            @RequestBody PostDTO postDTO,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+        return postService.updatePost(postDTO, files);
     }
 
     @GetMapping

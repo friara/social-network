@@ -22,9 +22,8 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String textToComm;
+    private String text;
     private Long answerToComm;
-    private Long image;
 
     public Long getId() {
         return id;
@@ -59,11 +58,11 @@ public class Comment {
     }
 
     public String getTextToComm() {
-        return textToComm;
+        return text;
     }
 
     public void setTextToComm(String textToComm) {
-        this.textToComm = textToComm;
+        this.text = textToComm;
     }
 
     public Long getAnswerToComm() {
@@ -72,13 +71,5 @@ public class Comment {
 
     public void setAnswerToComm(Long answerToComm) {
         this.answerToComm = answerToComm;
-    }
-
-    public Long getImage() {
-        return image;
-    }
-
-    public void setImage(Long image) {
-        this.image = image;
     }
 }
