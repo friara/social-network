@@ -1,6 +1,7 @@
 package com.example.social_network01.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
 import lombok.Data;
 import lombok.Getter;
 
@@ -10,12 +11,21 @@ import java.util.List;
 @Entity
 @Data
 public class Chat {
+    public enum ChatType {
+        PRIVATE,        // Личный чат (2 участника)
+        GROUP;          // Групповой чат
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String chatType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ChatType chatType;
     private String chatName;
+
+    @Past
     private LocalDateTime createdWhen;
 
     @ManyToOne
@@ -36,11 +46,11 @@ public class Chat {
         this.id = id;
     }
 
-    public String getChatType() {
+    public ChatType getChatType() {
         return chatType;
     }
 
-    public void setChatType(String chatType) {
+    public void setChatType(ChatType chatType) {
         this.chatType = chatType;
     }
 

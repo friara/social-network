@@ -1,7 +1,10 @@
 package com.example.social_network01.model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,13 +16,17 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Past
+    @Column(nullable = false)
     private LocalDateTime createdWhen;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Size(max = 255)
     private String title;
+
     private String text;
 
     @OneToMany(mappedBy = "post")
@@ -32,6 +39,7 @@ public class Post {
     private List<Repost> reposts;
 
     @OneToMany(mappedBy = "post")
+    @JsonManagedReference
     private List<Media> media;
 
     public Long getId() {

@@ -2,6 +2,7 @@ package com.example.social_network01.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -16,12 +17,14 @@ public class Comment {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Past
     private LocalDateTime createdWhen;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false)
     private String text;
     private Long answerToComm;
 

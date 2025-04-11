@@ -18,6 +18,7 @@ public class Repost {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false)
     private Long targetChatId;
 
     public Long getId() {

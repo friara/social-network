@@ -1,8 +1,12 @@
 package com.example.social_network01.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,11 +25,22 @@ public class Message {
     private User user;
 
     private String text;
-    private LocalDateTime createdWhen;
-    private String status;
 
-    @OneToMany(mappedBy = "message")
-    private List<MessageFile> messageFiles;
+    @PastOrPresent
+    private LocalDateTime createdWhen;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 15)
+    private MessageStatus status = MessageStatus.SENT;  // Значение по умолчанию
+
+    // Связь один-ко-многим с File
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // Управление сериализацией
+    private List<File> files = new ArrayList<>();
+
+    public enum MessageStatus {
+        SENT, DELIVERED, READ, EDITED, DELETED
+    }
 
     public Long getId() {
         return id;
@@ -67,19 +82,20 @@ public class Message {
         this.createdWhen = createdWhen;
     }
 
-    public String getStatus() {
+    public MessageStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(MessageStatus status) {
         this.status = status;
     }
 
-    public List<MessageFile> getMessageFiles() {
-        return messageFiles;
+    public List<File> getFiles() {
+        return files;
     }
 
-    public void setMessageFiles(List<MessageFile> messageFiles) {
-        this.messageFiles = messageFiles;
+    public void setFiles(List<File> files) {
+        this.files = files;
     }
+
 }

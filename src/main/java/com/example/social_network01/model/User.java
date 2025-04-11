@@ -3,6 +3,10 @@ package com.example.social_network01.model;
 
 import com.example.social_network01.model.*;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,19 +18,51 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "Users")
+@Table(name = "Users",
+        uniqueConstraints = {
+        @UniqueConstraint(columnNames = "login"),
+        @UniqueConstraint(columnNames = "phoneNumber")
+})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(min = 3, max = 50)
+    @Column(unique = true, nullable = false)
     private String login;
+
+    @NotBlank
+    @Pattern(regexp = "^\\+?[0-9]{7,15}$")
+    @Column(nullable = false, unique = true)
+    private String phoneNumber;
+
+    @NotBlank
+    @Size(min = 6)
+    @Column(nullable = false)
     private String password;
+
+    @NotBlank
+    @Size(max = 100)
+    @Column(nullable = false)
     private String lastName;
+
+    @NotBlank
+    @Size(max = 100)
+    @Column(nullable = false)
     private String firstName;
+
+    @Size(max = 100)
     private String patronymic;
+
+    @Size(max = 255)
     private String appointment;
+
+    @Past
+    @Column(nullable = false)
     private LocalDate birthday;
+
     private String avatarPath;
 
     @OneToMany(mappedBy = "user")
@@ -175,5 +211,13 @@ public class User implements UserDetails {
     public void setRole(Role role) {
         this.role = role;
     }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
 }
 

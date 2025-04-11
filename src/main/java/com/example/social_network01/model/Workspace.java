@@ -14,6 +14,7 @@ public class Workspace {
     private String name;
     private String location;
     private String description;
+    @Column(nullable = false)
     private boolean isAvailable;
 
     @OneToMany(mappedBy = "workspace")
