@@ -85,6 +85,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                     .requestMatchers(
                             "/swagger-ui/**",
                             "/v3/api-docs/**",
+                            "/v3/api-docs.yaml",
                             "/swagger-ui.html",
                             "/swagger-resources/**",
                             "/webjars/**"

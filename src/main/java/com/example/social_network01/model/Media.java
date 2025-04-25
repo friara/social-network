@@ -1,11 +1,13 @@
 package com.example.social_network01.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+@Schema(hidden = true)
 @Entity
 @Data
 @Table(name = "media")

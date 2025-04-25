@@ -2,6 +2,7 @@ package com.example.social_network01.model;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
@@ -9,6 +10,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Schema(hidden = true)
 @Entity
 @Data
 public class Post {

@@ -1,9 +1,11 @@
 package com.example.social_network01.model;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
+@Schema(hidden = true)
 @Entity
 @Data
 @Table(name = "Roles")

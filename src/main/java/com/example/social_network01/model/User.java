@@ -2,6 +2,7 @@ package com.example.social_network01.model;
 
 
 import com.example.social_network01.model.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+@Schema(hidden = true)
 @Entity
 @Data
 @Table(name = "Users",

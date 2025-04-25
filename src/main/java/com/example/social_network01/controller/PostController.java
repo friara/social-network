@@ -25,8 +25,11 @@ public class PostController {
     }
     @PutMapping("/{id}")
     public PostDTO updatePost(
-            @RequestBody PostDTO postDTO,
-            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+            @PathVariable("id") Long id,
+            @ModelAttribute PostDTO postDTO,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files
+    ) {
+        postDTO.setId(id);
         return postService.updatePost(postDTO, files);
     }
 
