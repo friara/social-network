@@ -14,4 +14,5 @@ public class UserDTO {
     private String appointment;
     private LocalDate birthday;
     private String avatarUrl;
+    private String phoneNumber;
 }

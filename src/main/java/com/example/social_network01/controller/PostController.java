@@ -4,6 +4,7 @@ import com.example.social_network01.dto.PostDTO;
 import com.example.social_network01.service.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +17,7 @@ public class PostController {
     @Autowired
     private PostService postService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public PostDTO createPost(
             @RequestParam("title") String title,
@@ -23,6 +25,8 @@ public class PostController {
             @RequestParam("files") List<MultipartFile> files) {
         return postService.createPost(title, text, files);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public PostDTO updatePost(
             @PathVariable("id") Long id,
@@ -48,6 +52,7 @@ public class PostController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         postService.deletePost(id);

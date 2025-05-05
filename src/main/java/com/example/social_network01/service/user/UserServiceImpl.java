@@ -1,13 +1,13 @@
 package com.example.social_network01.service.user;
 
 import com.example.social_network01.dto.UserDTO;
+import com.example.social_network01.exception.custom.UserNotFoundException;
 import com.example.social_network01.model.User;
 import com.example.social_network01.repository.UserRepository;
-import com.example.social_network01.service.user.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,13 +39,26 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserById(Long id) {
         return userRepository.findById(id)
                 .map(user -> modelMapper.map(user, UserDTO.class))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+    }
+
+    @Override
+    public UserDTO getUserByLogin(String login) {
+        return userRepository.findByLogin(login)
+                .map(user -> modelMapper.map(user, UserDTO.class))
+                .orElseThrow(() -> new UserNotFoundException("User not found with login: " + login));
+    }
+
+    @Override
+    public Page<UserDTO> searchByFIO(String query, Pageable pageable) {
+        return userRepository.findByFIOContaining(query, pageable)
+                .map(user -> modelMapper.map(user, UserDTO.class));
     }
 
     @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         modelMapper.map(userDTO, User.class);
         user.setLogin(userDTO.getLogin());
         user.setLastName(userDTO.getLastName());

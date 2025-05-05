@@ -10,7 +10,7 @@ public class PostDTO {
     private LocalDateTime createdWhen;
     private String title;
     private String text;
-    private List<String> mediaUrls; // Список ссылок на медиафайлы
+    private List<MediaDTO> mediaUrls; // Список ссылок на медиафайлы
     private Long userId;
 }
 

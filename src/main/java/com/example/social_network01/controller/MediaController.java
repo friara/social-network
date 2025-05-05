@@ -1,5 +1,6 @@
 package com.example.social_network01.controller;
 
+import com.example.social_network01.service.StorageService;
 import com.example.social_network01.service.media.MediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,17 +19,18 @@ import java.nio.file.Paths;
 @RequestMapping("/api/media")
 public class MediaController {
 
+
     @Autowired
     private MediaService mediaService;
 
-    /**
-     * Получение медиафайла по имени.
-     */
     @GetMapping("/{filename:.+}")
-    public ResponseEntity<Resource> getMediaFile(@PathVariable String filename) throws IOException {
-        Resource resource = mediaService.getMediaFile(filename);
+    public ResponseEntity<Resource> downloadMedia(@PathVariable String filename) throws IOException {
+        Resource file = mediaService.getMediaFile(filename);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + file.getFilename() + "\""
+                )
+                .body(file);
     }
 }

@@ -174,13 +174,6 @@ public class User implements UserDetails {
         this.birthday = birthday;
     }
 
-    public String getAvatarPath() {
-        return avatarPath;
-    }
-
-    public void setAvatarPath(String avatarPath) {
-        this.avatarPath = avatarPath;
-    }
 
     public List<Post> getPosts() {
         return posts;

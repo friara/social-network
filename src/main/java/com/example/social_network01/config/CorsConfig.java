@@ -13,19 +13,19 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5000") // Домен вашего Flutter-клиента
+                        .allowedOrigins("http://localhost:3000") // Домен Flutter-клиента
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true); // Для работы с куки/токенами
-                // Разрешаем запросы для Swagger UI (если он размещён локально)
+                // Разрешаем запросы для Swagger UI
                 registry.addMapping("/swagger-ui/**")
-                        .allowedOrigins("http://localhost:8080")  // URL вашего Spring Boot-приложения
+                        .allowedOrigins("http://localhost:8080")  // URL Spring Boot-приложения
                         .allowedMethods("GET")
                         .allowedHeaders("*");
 
                 // Разрешаем доступ к OpenAPI документации
                 registry.addMapping("/v3/api-docs/**")
-                        .allowedOrigins("*")  // Доступ из любого источника (или укажите конкретный)
+                        .allowedOrigins("*")  // Доступ из любого источника
                         .allowedMethods("GET");
             }
         };

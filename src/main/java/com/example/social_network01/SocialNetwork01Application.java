@@ -20,9 +20,9 @@ public class SocialNetwork01Application {
 	@Bean
 	public UserDetailsService userDetailsService(UserRepository userRepo) {
 		return username -> {
-			User user = userRepo.findByLogin(username);
-			if (user != null) return user;
-			throw new UsernameNotFoundException("User ‘" + username + "’ not found");
+			User user = userRepo.findByLogin(username)
+					.orElseThrow(() -> new UsernameNotFoundException(username));
+			return user;
 		};
 	}
 }

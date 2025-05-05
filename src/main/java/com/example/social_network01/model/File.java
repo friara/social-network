@@ -48,10 +48,6 @@ public class File {
     @Column(nullable = false, length = 255)
     private String fileName;
 
-    @NotBlank
-    @Column(nullable = false, length = 500)
-    private String filePath;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private FileType fileType;
@@ -94,83 +90,10 @@ public class File {
     }
 
     // Валидация при сохранении
-
     @PreUpdate
     private void validateFile() {
         if (fileSize <= 0) {
             throw new IllegalArgumentException("File size must be positive");
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-    public FileType getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(FileType fileType) {
-        this.fileType = fileType;
-    }
-
-    public LocalDateTime getUploadedWhen() {
-        return uploadedWhen;
-    }
-
-    public void setUploadedWhen(LocalDateTime uploadedWhen) {
-        this.uploadedWhen = uploadedWhen;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Message getMessage() {
-        return message;
-    }
-
-    public void setMessage(Message message) {
-        this.message = message;
-    }
-
-    public Long getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(Long fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
     }
 }

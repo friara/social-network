@@ -1,7 +1,9 @@
 package com.example.social_network01.service.post;
 
 import com.example.social_network01.dto.CommentDTO;
+import com.example.social_network01.dto.MediaDTO;
 import com.example.social_network01.dto.PostDTO;
+import com.example.social_network01.exception.custom.PostNotFoundException;
 import com.example.social_network01.model.Comment;
 import com.example.social_network01.model.Media;
 import com.example.social_network01.model.Post;
@@ -11,8 +13,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,50 +38,46 @@ public class PostServiceImpl implements PostService {
         return modelMapper.map(postRepository.save(post), PostDTO.class);
     }
 
-    /**
-     * Создание нового поста с прикрепленными медиафайлами.
-     */
+    // Создание нового поста с прикрепленными медиафайлами.
     @Override
+    @Transactional
     public PostDTO createPost(String title, String text, List<MultipartFile> files) {
-
-        // Создание объекта поста
         Post post = new Post();
         post.setTitle(title);
         post.setText(text);
         post.setCreatedWhen(LocalDateTime.now());
+        post = postRepository.save(post);
 
-        // Сохранение медиафайлов
-        List<Media> mediaList = mediaService.saveMediaFiles(files, post);
-
+        List<Media> mediaList = (files != null && !files.isEmpty())
+                ? mediaService.saveMediaFiles(files, post)
+                : Collections.emptyList();
         post.setMedia(mediaList);
 
-        // Сохранение поста
-        postRepository.save(post);
-
-        // Преобразование поста в DTO
         return mapToDTO(post);
     }
 
     @Override
+    @Transactional
     public PostDTO updatePost(PostDTO postDTO, List<MultipartFile> files) {
         Post post = postRepository.findById(postDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
+
+        if (post.getMedia() != null && !post.getMedia().isEmpty()) {
+            mediaService.deleteMedia(post.getMedia());
+        }
+
+        List<Media> mediaList = (files != null && !files.isEmpty())
+                ? mediaService.saveMediaFiles(files, post)
+                : Collections.emptyList();
+        post.setMedia(mediaList);
 
         post.setTitle(postDTO.getTitle());
         post.setText(postDTO.getText());
-
-        // Обновление медиафайлов
-        if (files != null && !files.isEmpty()) {
-            List<Media> mediaList = mediaService.saveMediaFiles(files, post);
-            post.setMedia(mediaList);
-        }
-
-        // Сохранение обновленного поста
         postRepository.save(post);
 
-        // Преобразование поста в DTO
         return mapToDTO(post);
     }
+
     @Override
     public PostDTO updatePost(PostDTO postDTO) {
         return null;
@@ -95,9 +95,12 @@ public class PostServiceImpl implements PostService {
         postDTO.setCreatedWhen(post.getCreatedWhen());
         postDTO.setTitle(post.getTitle());
         postDTO.setText(post.getText());
+
+        // Маппим Media в MediaDTO
         postDTO.setMediaUrls(post.getMedia().stream()
-                .map(Media::getFilePath)
+                .map(media -> modelMapper.map(media, MediaDTO.class)) // Используем ModelMapper
                 .collect(Collectors.toList()));
+
         return postDTO;
     }
 

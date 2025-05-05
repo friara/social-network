@@ -8,9 +8,10 @@ import java.time.LocalDateTime;
 public class FileDTO {
     private Long id;
     private String fileName;
-    private String filePath;
+    private String fileUrl;
     private String fileType;
     private LocalDateTime uploadedWhen;
     private Long uploadedBy;
+    private Long messageId;
 }
 

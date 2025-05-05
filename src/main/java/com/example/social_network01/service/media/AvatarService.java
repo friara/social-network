@@ -15,25 +15,16 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Service
-public class ImageService {
+public class AvatarService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AvatarService.class);
 
-    @Value("${image.storage.location}")
-    private String imageStorageLocation;
-
-//    public ImageService() {
-//        // Создаем директорию для хранения изображений, если она не существует
-//        try {
-//            Files.createDirectories(Paths.get(imageStorageLocation));
-//        } catch (IOException e) {
-//            throw new RuntimeException("Could not create image storage directory", e);
-//        }
-//    }
+    @Value("${avatar.storage-path}")
+    private String avatarStorageLocation;
 
     public String saveImage(MultipartFile file) {
         try {
-            Path targetLocation = Paths.get(imageStorageLocation)
+            Path targetLocation = Paths.get(avatarStorageLocation)
                     .resolve(file.getOriginalFilename())
                     .toAbsolutePath()
                     .normalize();
@@ -44,11 +35,8 @@ public class ImageService {
         }
     }
 
-    /**
-     * Получение изображения по имени.
-     */
     public Resource getImageFile(String filename) throws IOException {
-        Path file = Paths.get(imageStorageLocation).resolve(filename).toAbsolutePath().normalize();
+        Path file = Paths.get(avatarStorageLocation).resolve(filename).toAbsolutePath().normalize();
         Resource resource = new UrlResource(file.toUri());
 
         if (resource.exists() || resource.isReadable()) {

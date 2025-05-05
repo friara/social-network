@@ -1,43 +1,35 @@
 package com.example.social_network01.controller;
 
-import com.example.social_network01.dto.FileDTO;
 import com.example.social_network01.service.file.FileService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/files")
+@RequiredArgsConstructor
 public class FileController {
 
-    @Autowired
-    private FileService fileService;
+    private final FileService fileService;
 
-    @PostMapping
-    public FileDTO createFile(@RequestBody FileDTO fileDTO) {
-        return fileService.createFile(fileDTO);
-    }
+    /**
+     * Скачивание файла по имени
+     * @param filename Имя файла с расширением
+     * @return Файл как ресурс с заголовком для скачивания
+     */
+    @GetMapping("/{filename:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
+            Resource file = fileService.loadFile(filename);
+            return ResponseEntity.ok()
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + file.getFilename() + "\""
+                    )
+                    .body(file);
 
-    @GetMapping
-    public List<FileDTO> getAllFiles() {
-        return fileService.getAllFiles();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<FileDTO> getFileById(@PathVariable Long id) {
-        FileDTO fileDTO = fileService.getFileById(id);
-        if (fileDTO != null) {
-            return ResponseEntity.ok(fileDTO);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFile(@PathVariable Long id) {
-        fileService.deleteFile(id);
-        return ResponseEntity.noContent().build();
     }
 }
