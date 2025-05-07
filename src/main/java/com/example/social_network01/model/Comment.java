@@ -1,80 +1,32 @@
 package com.example.social_network01.model;
 
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Past;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-@Schema(hidden = true)
 @Entity
 @Data
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @Past
-    private LocalDateTime createdWhen;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdWhen = LocalDateTime.now();
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String text;
-    private Long answerToComm;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public LocalDateTime getCreatedWhen() {
-        return createdWhen;
-    }
-
-    public void setCreatedWhen(LocalDateTime createdWhen) {
-        this.createdWhen = createdWhen;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getTextToComm() {
-        return text;
-    }
-
-    public void setTextToComm(String textToComm) {
-        this.text = textToComm;
-    }
-
-    public Long getAnswerToComm() {
-        return answerToComm;
-    }
-
-    public void setAnswerToComm(Long answerToComm) {
-        this.answerToComm = answerToComm;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "answer_to_comm_id")
+    private Comment answerToComm;
 }

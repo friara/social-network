@@ -1,5 +1,6 @@
 package com.example.social_network01.service.user;
 
+import com.example.social_network01.dto.UserCreateRequestDTO;
 import com.example.social_network01.dto.UserDTO;
 import com.example.social_network01.exception.custom.UserNotFoundException;
 import com.example.social_network01.model.User;
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
     private ModelMapper modelMapper;
 
     @Override
-    public UserDTO createUser(UserDTO userDTO) {
+    public UserDTO createUser(UserCreateRequestDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
         return modelMapper.map(userRepository.save(user), UserDTO.class);
     }

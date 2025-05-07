@@ -1,13 +1,19 @@
 package com.example.social_network01.service.like;
 
 import com.example.social_network01.dto.LikeDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 public interface LikeService {
-    LikeDTO createLike(LikeDTO likeDTO);
-    List<LikeDTO> getAllLikes();
-    LikeDTO getLikeById(Long id);
-    void deleteLike(Long id);
+
+    LikeDTO createLike(Long postId, Long userId);
+
+    Page<LikeDTO> getLikesByPost(Long postId, Pageable pageable);
+
+    void deleteLike(Long postId, Long userId);
+
+    Long getLikesCount(Long postId);
+
 }
 

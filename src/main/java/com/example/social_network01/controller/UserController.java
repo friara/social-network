@@ -1,10 +1,12 @@
 package com.example.social_network01.controller;
 
+import com.example.social_network01.dto.UserCreateRequestDTO;
 import com.example.social_network01.dto.UserDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.media.AvatarService;
 import com.example.social_network01.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,9 +74,11 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public UserDTO adminCreateUser(@RequestBody UserDTO userDTO) {
-        return userService.createUser(userDTO);
+    public ResponseEntity<UserDTO> adminCreateUser(@RequestBody @Valid UserCreateRequestDTO request) {
+        UserDTO response = userService.createUser(request);
+        return ResponseEntity.ok(response); // Пароль не будет включен в ответ
     }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")

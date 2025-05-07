@@ -9,7 +9,7 @@ public class CommentDTO {
     private LocalDateTime createdWhen;
     private Long postId;
     private Long userId;
-    private String textToComm;
+    private String text;
     private String answerToComm;
 }
 
