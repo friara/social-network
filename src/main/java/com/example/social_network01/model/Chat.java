@@ -1,21 +1,18 @@
 package com.example.social_network01.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Past;
 import lombok.Data;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Schema(hidden = true)
-@Entity
 @Data
+@Entity
+@Table(name = "chats")
 public class Chat {
+
     public enum ChatType {
-        PRIVATE,        // Личный чат (2 участника)
-        GROUP;          // Групповой чат
+        PRIVATE, GROUP
     }
 
     @Id
@@ -25,21 +22,20 @@ public class Chat {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatType chatType;
+
+    @Column(nullable = false)
     private String chatName;
 
-    @Past
+    @Column(nullable = false)
     private LocalDateTime createdWhen;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
-    @OneToMany(mappedBy = "chat")
-    private List<ChatMember> chatMembers;
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatMember> chatMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chat")
-    private List<Message> messages;
-
-
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages = new ArrayList<>();
 }
-

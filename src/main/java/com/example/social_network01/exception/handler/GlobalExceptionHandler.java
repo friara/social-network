@@ -5,6 +5,7 @@ import com.example.social_network01.exception.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -102,6 +103,12 @@ public class GlobalExceptionHandler {
                 "Chat not found",
                 ex.getMessage()
         );
+    }
+
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<String> handleForbidden(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(

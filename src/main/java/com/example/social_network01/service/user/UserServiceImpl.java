@@ -1,9 +1,12 @@
 package com.example.social_network01.service.user;
 
-import com.example.social_network01.dto.UserCreateRequestDTO;
+import com.example.social_network01.dto.UserExtendedDTO;
 import com.example.social_network01.dto.UserDTO;
+import com.example.social_network01.exception.custom.ResourceNotFoundException;
 import com.example.social_network01.exception.custom.UserNotFoundException;
+import com.example.social_network01.model.Role;
 import com.example.social_network01.model.User;
+import com.example.social_network01.repository.RoleRepository;
 import com.example.social_network01.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +29,11 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
-    public UserDTO createUser(UserCreateRequestDTO userDTO) {
+    public UserDTO createUser(UserExtendedDTO userDTO) {
         // Маппинг DTO в сущность User
         User user = modelMapper.map(userDTO, User.class);
 
@@ -81,6 +86,34 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(userRepository.save(user), UserDTO.class);
     }
 
+    @Override
+    public UserDTO adminUpdateUser(Long id, UserExtendedDTO userDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+
+        // Обновление роли
+        if (userDTO.getRoleName() != null && !userDTO.getRoleName().isEmpty()) {
+            Role newRole = roleRepository.findByName(userDTO.getRoleName())
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found " + userDTO.getRoleName()));
+            user.setRole(newRole);
+        }
+
+        modelMapper.map(userDTO, user);
+
+        // Игнорируем поля, которые не должны обновляться через DTO
+        modelMapper.getConfiguration().setPropertyCondition(context ->
+                !context.getMapping().getLastDestinationProperty().getName().equals("password")
+        );
+
+        User updatedUser = userRepository.save(user);
+        return convertToDTO(updatedUser);
+    }
+
+    private UserDTO convertToDTO(User user) {
+        UserDTO dto = modelMapper.map(user, UserDTO.class);
+        dto.setRoleName(user.getRole().getName());
+        return dto;
+    }
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);

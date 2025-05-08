@@ -1,11 +1,10 @@
 package com.example.social_network01.controller;
 
-import com.example.social_network01.dto.UserCreateRequestDTO;
+import com.example.social_network01.dto.UserExtendedDTO;
 import com.example.social_network01.dto.UserDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.media.AvatarService;
 import com.example.social_network01.service.user.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -74,9 +73,19 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<UserDTO> adminCreateUser(@RequestBody @Valid UserCreateRequestDTO request) {
+    public ResponseEntity<UserDTO> adminCreateUser(@RequestBody @Valid UserExtendedDTO request) {
         UserDTO response = userService.createUser(request);
         return ResponseEntity.ok(response); // Пароль не будет включен в ответ
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> adminUpdateUser(
+            @PathVariable Long id,
+            @RequestBody @Valid UserExtendedDTO userDTO
+    ) {
+        UserDTO updatedUser = userService.adminUpdateUser(id, userDTO);
+        return ResponseEntity.ok(updatedUser);
     }
 
 
@@ -95,75 +104,3 @@ public class UserController {
     }
 
 }
-
-
-
-//@RestController
-//@RequestMapping("/api/users")
-//public class UserController {
-//
-//    @Autowired
-//    private UserService userService;
-//
-//    @Autowired
-//    private AvatarService avatarService;
-//
-//    @PostMapping
-//    public UserDTO createUser(@RequestBody UserDTO userDTO) {
-//        return userService.createUser(userDTO);
-//    }
-//
-//    @GetMapping
-//    public List<UserDTO> getAllUsers() {
-//        return userService.getAllUsers();
-//    }
-//
-//
-//    // Поиск по ID
-//    @GetMapping("/{id}")
-//    public UserDTO getUserById(@PathVariable Long id) {
-//        return userService.getUserById(id);
-//    }
-//
-//    // Для поиска по логину
-//    @GetMapping("/by-login/{login}")
-//    public UserDTO getUserByLogin(@PathVariable String login) {
-//        return userService.getUserByLogin(login);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public UserDTO updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-//        return userService.updateUser(id, userDTO);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public void deleteUser(@PathVariable Long id) {
-//        userService.deleteUser(id);
-//    }
-//
-//    /**
-//     * Загрузка аватара пользователя.
-//     */
-//    @PostMapping("/{id}/avatar")
-//    public String uploadAvatar(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
-//        // Сохранение изображения на сервере
-//        String imagePath = avatarService.saveImage(file);
-//
-//        // Обновление информации о пользователе в базе данных
-//        UserDTO userDTO = userService.getUserById(id);
-//        userDTO.setAvatarUrl(imagePath);
-//        userService.updateUser(id, userDTO);
-//
-//        return imagePath;
-//    }
-//
-//    @GetMapping("/search")
-//    public Page<UserDTO> searchByFIO(
-//            @RequestParam String query,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "10") int size
-//    ) {
-//        return userService.searchByFIO(query, PageRequest.of(page, size));
-//    }
-//
-//}
