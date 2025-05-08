@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,12 +22,21 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Override
     public UserDTO createUser(UserCreateRequestDTO userDTO) {
+        // Маппинг DTO в сущность User
         User user = modelMapper.map(userDTO, User.class);
-        return modelMapper.map(userRepository.save(user), UserDTO.class);
+
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Шифрование
+
+        // Сохранение и возврат DTO
+        User savedUser = userRepository.save(user);
+        return modelMapper.map(savedUser, UserDTO.class);
     }
 
     @Override
