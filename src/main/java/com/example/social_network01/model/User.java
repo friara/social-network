@@ -76,6 +76,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Booking> bookings;
 
+    @OneToMany(mappedBy = "user")
+    private List<ChatMember> chatMembers;
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;

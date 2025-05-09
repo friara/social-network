@@ -1,14 +1,15 @@
 package com.example.social_network01.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Schema(hidden = true)
 @Data
 @Entity
-@Table(name = "chats")
 public class Chat {
 
     public enum ChatType {
