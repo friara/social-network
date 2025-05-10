@@ -8,13 +8,17 @@ import com.example.social_network01.model.Role;
 import com.example.social_network01.model.User;
 import com.example.social_network01.repository.RoleRepository;
 import com.example.social_network01.repository.UserRepository;
+import com.example.social_network01.service.media.AvatarService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +27,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AvatarService avatarService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -34,10 +41,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO createUser(UserExtendedDTO userDTO) {
+        String password = userDTO.getPassword();
         // Маппинг DTO в сущность User
         User user = modelMapper.map(userDTO, User.class);
 
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Шифрование
+        user.setPassword(passwordEncoder.encode(password)); // Шифрование
 
         // Сохранение и возврат DTO
         User savedUser = userRepository.save(user);
@@ -49,6 +57,20 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream()
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserExtendedDTO> getAllUsersWithPassword() {
+        return userRepository.findAll().stream()
+                .map(user -> modelMapper.map(user, UserExtendedDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserExtendedDTO getUserWithPasswordById(Long id) {
+        return userRepository.findById(id)
+                .map(user -> modelMapper.map(user, UserExtendedDTO.class))
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
     @Override
@@ -75,14 +97,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        modelMapper.map(userDTO, User.class);
-        user.setLogin(userDTO.getLogin());
-        user.setLastName(userDTO.getLastName());
-        user.setFirstName(userDTO.getFirstName());
-        user.setPatronymic(userDTO.getPatronymic());
-        user.setAppointment(userDTO.getAppointment());
-        user.setBirthday(userDTO.getBirthday());
-        user.setAvatarPath(userDTO.getAvatarUrl());
+        modelMapper.map(userDTO, user);
         return modelMapper.map(userRepository.save(user), UserDTO.class);
     }
 
@@ -117,6 +132,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDTO uploadAvatar(Long id, MultipartFile file) {
+        String imagePath = avatarService.saveImage(file);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        Path path = Paths.get(imagePath);
+        String fileName = path.getFileName().toString();
+        user.setAvatarPath(fileName);
+        userRepository.save(user);
+
+        return getUserById(id);
     }
 
 }

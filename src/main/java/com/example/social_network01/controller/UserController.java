@@ -5,10 +5,15 @@ import com.example.social_network01.dto.UserDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.media.AvatarService;
 import com.example.social_network01.service.user.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,8 +34,7 @@ public class UserController {
     @Autowired
     private AvatarService avatarService;
 
-    // Только для администраторов
-    @PreAuthorize("hasRole('ADMIN')")
+
     @GetMapping
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
@@ -46,23 +50,22 @@ public class UserController {
     @PutMapping("/me")
     public UserDTO updateCurrentUser(
             @AuthenticationPrincipal User user,
-            @RequestBody UserDTO userDTO
+            @RequestBody @Valid UserDTO userDTO
     ) {
         return userService.updateUser(user.getId(), userDTO);
     }
 
 
     // Загрузка аватара для текущего пользователя
-    @PostMapping("/me/avatar")
-    public String uploadAvatar(
+    @PostMapping(
+            value = "/me/avatar",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public UserDTO uploadAvatar(
             @AuthenticationPrincipal User user,
             @RequestParam("file") MultipartFile file
-    ) throws IOException {
-        String imagePath = avatarService.saveImage(file);
-        UserDTO userDTO = userService.getUserById(user.getId());
-        userDTO.setAvatarUrl(imagePath);
-        userService.updateUser(user.getId(), userDTO);
-        return imagePath;
+    ) {
+        return userService.uploadAvatar(user.getId(), file);
     }
 
 
@@ -87,12 +90,35 @@ public class UserController {
         UserDTO updatedUser = userService.adminUpdateUser(id, userDTO);
         return ResponseEntity.ok(updatedUser);
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/full")
+    public List<UserExtendedDTO> adminGetAllUsers() {
+        return userService.getAllUsersWithPassword();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}/full")
+    public UserExtendedDTO adminGetUser(@PathVariable Long id) {
+        return userService.getUserWithPasswordById(id);
+    }
 
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void adminDeleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+    }
+
+    // Загрузка аватара для выбранного админом пользователя
+    @PostMapping(
+            value = "/{id}/avatar",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public UserDTO adminUploadAvatar(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        return userService.uploadAvatar(id, file);
     }
 
     @GetMapping("/search")

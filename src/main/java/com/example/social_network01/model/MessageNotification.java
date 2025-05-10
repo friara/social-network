@@ -1,5 +1,6 @@
 package com.example.social_network01.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -7,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
+@Schema(hidden = true)
 @Entity
 @Data
 public class MessageNotification {
