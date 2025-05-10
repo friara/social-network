@@ -7,10 +7,12 @@ import com.example.social_network01.model.Chat;
 import com.example.social_network01.model.File;
 import com.example.social_network01.model.Message;
 import com.example.social_network01.model.User;
+import com.example.social_network01.model.events.NewMessageEvent;
 import com.example.social_network01.repository.MessageRepository;
 import com.example.social_network01.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,7 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final ModelMapper modelMapper;
     private final FileService fileService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -48,7 +51,7 @@ public class MessageServiceImpl implements MessageService {
                     .map(dto -> modelMapper.map(dto, File.class))
                     .collect(Collectors.toList()));
         }
-
+        eventPublisher.publishEvent(new NewMessageEvent(this, message, user.getId()));
         return modelMapper.map(message, MessageDTO.class);
     }
 
