@@ -11,6 +11,7 @@ import com.example.social_network01.repository.UserRepository;
 import com.example.social_network01.service.message.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,11 +31,11 @@ public class MessageController {
     private final UserRepository userRepository; // Добавляем репозиторий
     private final ChatRepository chatRepository; // Добавляем репозиторий
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDTO> createMessage(
             @RequestParam String text,
             @RequestParam(required = false) List<MultipartFile> files,
-            @AuthenticationPrincipal User currentUser, // Заменяем Principal
+            @AuthenticationPrincipal User currentUser,
             @RequestParam Long chatId) {
 
         User user = userRepository.findById(currentUser.getId())
@@ -47,7 +48,7 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageDTO);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDTO> updateMessage(
             @PathVariable Long id,
             @RequestParam String newText,

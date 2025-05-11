@@ -3,6 +3,7 @@ package com.example.social_network01.controller;
 import com.example.social_network01.dto.PostDTO;
 import com.example.social_network01.service.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class PostController {
     private PostService postService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PostDTO createPost(
             @RequestParam("title") String title,
             @RequestParam("text") String text,
@@ -27,7 +28,7 @@ public class PostController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PostDTO updatePost(
             @PathVariable("id") Long id,
             @ModelAttribute PostDTO postDTO,
