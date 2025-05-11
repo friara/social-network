@@ -85,11 +85,12 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> adminUpdateUser(
             @PathVariable Long id,
-            @RequestBody @Valid UserExtendedDTO userDTO
+            @RequestBody @Valid UserDTO userDTO
     ) {
-        UserDTO updatedUser = userService.adminUpdateUser(id, userDTO);
+        UserDTO updatedUser = userService.updateUser(id, userDTO);
         return ResponseEntity.ok(updatedUser);
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/full")
     public List<UserExtendedDTO> adminGetAllUsers() {
