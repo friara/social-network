@@ -1,6 +1,7 @@
 package com.example.social_network01.controller;
 
 import com.example.social_network01.dto.PostDTO;
+import com.example.social_network01.dto.PostResponseDTO;
 import com.example.social_network01.service.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,10 +22,9 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PostDTO createPost(
-            @RequestParam("title") String title,
             @RequestParam("text") String text,
-            @RequestParam("files") List<MultipartFile> files) {
-        return postService.createPost(title, text, files);
+            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+        return postService.createPost(text, files);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -39,7 +39,7 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDTO> getAllPosts() {
+    public List<PostResponseDTO> getAllPosts() {
         return postService.getAllPosts();
     }
 

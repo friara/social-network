@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Schema(hidden = true)
@@ -26,23 +27,20 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-//    @Size(max = 255)
-//    private String title;
-
     @Lob
     private String text;
 
     @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
+    private List<Comment> comments  = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    private List<Like> likes;
+    private List<Like> likes  = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    private List<Repost> reposts;
+    private List<Repost> reposts  = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     @JsonManagedReference
-    private List<Media> media;
+    private List<Media> media  = new ArrayList<>();
 }
 

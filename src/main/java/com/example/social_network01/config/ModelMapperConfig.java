@@ -72,6 +72,17 @@ public class ModelMapperConfig {
                     }).map(UserExtendedDTO::getRoleName, User::setRole);
                 });
 
+        // Маппинг для Post -> PostResponseDTO
+        modelMapper.typeMap(Post.class, PostResponseDTO.class)
+                .addMappings(mapper -> {
+                    mapper.map(src -> src.getUser().getId(), PostResponseDTO::setUserId);
+                    mapper.map(src -> src.getComments() != null ? src.getComments().size() : 0, PostResponseDTO::setCommentCount);
+                    mapper.map(src -> src.getLikes() != null ? src.getLikes().size() : 0, PostResponseDTO::setLikeCount);
+                    mapper.map(src -> src.getReposts() != null ? src.getReposts().size() : 0, PostResponseDTO::setRepostCount);
+                    mapper.skip(PostResponseDTO::setLiked);
+                });
+
+
         // Маппинг для File -> FileDTO (fileUrl)
         modelMapper.typeMap(File.class, FileDTO.class)
                 .addMappings(mapper -> {

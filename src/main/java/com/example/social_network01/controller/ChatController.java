@@ -36,8 +36,7 @@ public class ChatController {
     @PreAuthorize("@chatService.isChatCreator(#id, #currentUser.id)")
     public ResponseEntity<ChatDTO> updateChat(
             @PathVariable Long id,
-            @RequestBody @Valid ChatDTO chatDTO,
-            @AuthenticationPrincipal User currentUser) {
+            @RequestBody @Valid ChatDTO chatDTO) {
         ChatDTO updatedChat = chatService.updateChat(id, chatDTO);
         return ResponseEntity.ok(updatedChat);
     }

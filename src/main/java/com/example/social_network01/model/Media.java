@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 
 @Schema(hidden = true)
@@ -55,6 +57,7 @@ public class Media {
     private Long fileSize;
 
     @Column(nullable = false)
+    @CreatedDate
     private LocalDateTime uploadedWhen;
 
     @PrePersist

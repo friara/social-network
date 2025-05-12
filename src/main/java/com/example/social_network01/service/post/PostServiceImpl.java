@@ -1,16 +1,17 @@
 package com.example.social_network01.service.post;
 
-import com.example.social_network01.dto.CommentDTO;
 import com.example.social_network01.dto.MediaDTO;
 import com.example.social_network01.dto.PostDTO;
+import com.example.social_network01.dto.PostResponseDTO;
 import com.example.social_network01.exception.custom.PostNotFoundException;
-import com.example.social_network01.model.Comment;
 import com.example.social_network01.model.Media;
 import com.example.social_network01.model.Post;
 import com.example.social_network01.repository.PostRepository;
 import com.example.social_network01.service.media.MediaService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,9 +42,8 @@ public class PostServiceImpl implements PostService {
     // Создание нового поста с прикрепленными медиафайлами.
     @Override
     @Transactional
-    public PostDTO createPost(String title, String text, List<MultipartFile> files) {
+    public PostDTO createPost(String text, List<MultipartFile> files) {
         Post post = new Post();
-        post.setTitle(title);
         post.setText(text);
         post.setCreatedWhen(LocalDateTime.now());
         post = postRepository.save(post);
@@ -71,7 +71,6 @@ public class PostServiceImpl implements PostService {
                 : Collections.emptyList();
         post.setMedia(mediaList);
 
-        post.setTitle(postDTO.getTitle());
         post.setText(postDTO.getText());
         postRepository.save(post);
 
@@ -82,10 +81,14 @@ public class PostServiceImpl implements PostService {
     public PostDTO updatePost(PostDTO postDTO) {
         return null;
     }
+
     @Override
-    public List<PostDTO> getAllPosts() {
+    public List<PostResponseDTO> getAllPosts() {
         return postRepository.findAll().stream()
-                .map(this::mapToDTO)
+                .map(p -> modelMapper.map(p, PostResponseDTO.class))
+//                        .setMedia(p.getMedia().stream()
+//                        .map(media -> modelMapper.map(media, MediaDTO.class))
+//                        .collect(Collectors.toList())))
                 .collect(Collectors.toList());
     }
 
@@ -93,11 +96,10 @@ public class PostServiceImpl implements PostService {
         PostDTO postDTO = new PostDTO();
         postDTO.setId(post.getId());
         postDTO.setCreatedWhen(post.getCreatedWhen());
-        postDTO.setTitle(post.getTitle());
         postDTO.setText(post.getText());
 
         // Маппим Media в MediaDTO
-        postDTO.setMediaUrls(post.getMedia().stream()
+        postDTO.setMedia(post.getMedia().stream()
                 .map(media -> modelMapper.map(media, MediaDTO.class)) // Используем ModelMapper
                 .collect(Collectors.toList()));
 
@@ -115,5 +117,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePost(Long id) {
         postRepository.deleteById(id);
+    }
+
+    private boolean isPostLikedByCurrentUser(Post post) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        String username = authentication.getName();
+        return post.getLikes().stream()
+                .anyMatch(like -> like.getUser().getLogin().equals(username));
     }
 }
