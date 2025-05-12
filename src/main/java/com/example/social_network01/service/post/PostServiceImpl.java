@@ -6,10 +6,13 @@ import com.example.social_network01.dto.PostResponseDTO;
 import com.example.social_network01.exception.custom.PostNotFoundException;
 import com.example.social_network01.model.Media;
 import com.example.social_network01.model.Post;
+import com.example.social_network01.model.User;
 import com.example.social_network01.repository.PostRepository;
 import com.example.social_network01.service.media.MediaService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -127,5 +130,38 @@ public class PostServiceImpl implements PostService {
         String username = authentication.getName();
         return post.getLikes().stream()
                 .anyMatch(like -> like.getUser().getLogin().equals(username));
+    }
+
+    @Override
+    public Page<PostResponseDTO> getPostsSortedByDate(Pageable pageable, User currentUser) {
+        return postRepository.findAllByOrderByCreatedWhenDesc(pageable)
+                .map(post -> {
+                    PostResponseDTO dto = modelMapper.map(post, PostResponseDTO.class);
+                    dto.setMedia(mapMedia(post.getMedia())); // Маппинг медиа
+                    dto.setLiked(checkIfLiked(post, currentUser)); // Логика проверки лайка
+                    return dto;
+                });
+    }
+
+    private List<MediaDTO> mapMedia(List<Media> mediaList) {
+        return mediaList.stream()
+                .map(media -> modelMapper.map(media, MediaDTO.class))
+                .toList();
+    }
+
+    private boolean checkIfLiked(Post post, User user) {
+        return post.getLikes().stream()
+                .anyMatch(like -> like.getUser().getId().equals(user.getId()));
+    }
+
+    @Override
+    public Page<PostResponseDTO> getPostsSortedByPopularity(Pageable pageable, User currentUser) {
+        return postRepository.findAllOrderByPopularityDesc(pageable)
+                .map(post -> {
+                    PostResponseDTO dto = modelMapper.map(post, PostResponseDTO.class);
+                    dto.setMedia(mapMedia(post.getMedia())); // Маппинг медиа
+                    dto.setLiked(checkIfLiked(post, currentUser)); // Логика проверки лайка
+                    return dto;
+                });
     }
 }

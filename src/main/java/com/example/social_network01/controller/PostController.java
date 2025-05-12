@@ -2,11 +2,17 @@ package com.example.social_network01.controller;
 
 import com.example.social_network01.dto.PostDTO;
 import com.example.social_network01.dto.PostResponseDTO;
+import com.example.social_network01.model.User;
 import com.example.social_network01.service.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,8 +45,20 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostResponseDTO> getAllPosts() {
-        return postService.getAllPosts();
+    public ResponseEntity<Page<PostResponseDTO>> getAllPosts(
+            @RequestParam(defaultValue = "date") String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal User currentUser) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdWhen").descending());
+
+        return switch (sortBy.toLowerCase()) {
+            case "popularity" ->
+                    ResponseEntity.ok(postService.getPostsSortedByPopularity(pageable, currentUser));
+            default ->
+                    ResponseEntity.ok(postService.getPostsSortedByDate(pageable, currentUser));
+        };
     }
 
     @GetMapping("/{id}")

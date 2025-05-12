@@ -1,6 +1,7 @@
 package com.example.social_network01.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -42,5 +43,11 @@ public class Post {
     @OneToMany(mappedBy = "post")
     @JsonManagedReference
     private List<Media> media  = new ArrayList<>();
+
+    @Transient
+    @JsonIgnore
+    public int getPopularityScore() {
+        return likes.size() + reposts.size() + comments.size();
+    }
 }
 
