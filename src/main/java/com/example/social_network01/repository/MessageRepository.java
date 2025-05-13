@@ -21,7 +21,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "AND m.user.id <> :userId")
     int countUnreadMessages(@Param("chatId") Long chatId, @Param("userId") Long userId);
 
-    Page<Message> findAllByChatId(Long chatId, Pageable pageable);
+    Page<Message> findAllByChat_Id(Long chatId, Pageable pageable);
 
     boolean existsByIdAndUserId(Long messageId, Long userId);
 

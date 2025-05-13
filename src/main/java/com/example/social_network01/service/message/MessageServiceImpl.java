@@ -1,6 +1,5 @@
 package com.example.social_network01.service.message;
 
-import com.example.social_network01.dto.FileDTO;
 import com.example.social_network01.dto.MessageDTO;
 import com.example.social_network01.dto.message.MessageCreateRequest;
 import com.example.social_network01.dto.message.MessageUpdateRequest;
@@ -8,7 +7,6 @@ import com.example.social_network01.exception.custom.ChatNotFoundException;
 import com.example.social_network01.exception.custom.MessageNotFoundException;
 import com.example.social_network01.exception.custom.UserNotFoundException;
 import com.example.social_network01.model.Chat;
-import com.example.social_network01.model.File;
 import com.example.social_network01.model.Message;
 import com.example.social_network01.model.User;
 import com.example.social_network01.model.events.NewMessageEvent;
@@ -24,12 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional(readOnly = true)
     public Page<MessageDTO> getMessagesByChatId(Long chatId, Pageable pageable) {
-        return messageRepository.findAllByChatId(chatId, pageable)
+        return messageRepository.findAllByChat_Id(chatId, pageable)
                 .map(message -> {
                     MessageDTO dto = modelMapper.map(message, MessageDTO.class);
                     dto.setFiles(fileService.getFilesForMessage(message.getId()));

@@ -1,6 +1,7 @@
 package com.example.social_network01.controller;
 
 
+import com.example.social_network01.dto.CommentDTO;
 import com.example.social_network01.dto.RepostDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.repost.RepostService;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/reposts")
+@RequestMapping("/api/posts/{postId}/reposts")
 public class RepostController {
 
     @Autowired
@@ -27,8 +28,8 @@ public class RepostController {
     }
 
     @GetMapping
-    public List<RepostDTO> getAllReposts() {
-        return repostService.getAllReposts();
+    public List<RepostDTO> getRepostsByPost(@PathVariable Long postId) {
+        return repostService.getRepostByPostId(postId);
     }
 
     @GetMapping("/{id}")

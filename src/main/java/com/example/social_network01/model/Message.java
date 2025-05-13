@@ -27,6 +27,7 @@ public class Message {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Lob
     private String text;
 
     @PastOrPresent

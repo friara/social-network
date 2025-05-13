@@ -9,4 +9,6 @@ public interface RepostService {
     List<RepostDTO> getAllReposts();
     RepostDTO getRepostById(Long id);
     void deleteRepost(Long id);
+
+    List<RepostDTO> getRepostByPostId(Long postId);
 }

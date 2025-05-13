@@ -43,4 +43,11 @@ public class RepostServiceImpl implements RepostService {
     public void deleteRepost(Long id) {
         repostRepository.deleteById(id);
     }
+
+    @Override
+    public List<RepostDTO> getRepostByPostId(Long postId) {
+        return repostRepository.findAllByPost_Id(postId)
+                .stream().map(repost -> modelMapper.map(repost, RepostDTO.class))
+                .collect(Collectors.toList());
+    }
 }
