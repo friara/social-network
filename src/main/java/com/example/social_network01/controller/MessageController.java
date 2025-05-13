@@ -1,6 +1,8 @@
 package com.example.social_network01.controller;
 
 import com.example.social_network01.dto.MessageDTO;
+import com.example.social_network01.dto.message.MessageCreateRequest;
+import com.example.social_network01.dto.message.MessageUpdateRequest;
 import com.example.social_network01.exception.custom.ChatNotFoundException;
 import com.example.social_network01.exception.custom.MessageNotFoundException;
 import com.example.social_network01.exception.custom.UserNotFoundException;
@@ -9,7 +11,14 @@ import com.example.social_network01.model.User;
 import com.example.social_network01.repository.ChatRepository;
 import com.example.social_network01.repository.UserRepository;
 import com.example.social_network01.service.message.MessageService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,75 +32,69 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@RequestMapping("/api/chats/{chatId}/messages")
 public class MessageController {
 
     private final MessageService messageService;
-    private final UserRepository userRepository; // Добавляем репозиторий
-    private final ChatRepository chatRepository; // Добавляем репозиторий
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageDTO> createMessage(
-            @RequestParam String text,
-            @RequestParam(required = false) List<MultipartFile> files,
-            @AuthenticationPrincipal User currentUser,
-            @RequestParam Long chatId) {
+    @GetMapping
+    @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
+    public ResponseEntity<Page<MessageDTO>> getChatMessages(
+            @PathVariable Long chatId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdWhen,desc") String[] sort) {
 
-        User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        Sort.Direction direction = sort[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort[0]));
 
-        Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(() -> new ChatNotFoundException("Chat not found"));
-
-        MessageDTO messageDTO = messageService.createMessage(text, user, chat, files);
-        return ResponseEntity.status(HttpStatus.CREATED).body(messageDTO);
+        return ResponseEntity.ok(messageService.getMessagesByChatId(chatId, pageable));
     }
 
-    @PutMapping(value="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
+    @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
+    public ResponseEntity<MessageDTO> createMessage(
+            @PathVariable Long chatId,
+            @RequestBody @Valid MessageCreateRequest request,
+            @AuthenticationPrincipal User currentUser) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(messageService.createMessage(chatId, currentUser.getId(), request));
+    }
+
+    @PutMapping("/{messageId}")
+    @PreAuthorize("@messageService.isMessageAuthor(#messageId, #currentUser.id)")
     public ResponseEntity<MessageDTO> updateMessage(
-            @PathVariable Long id,
-            @RequestParam String newText,
-            @RequestParam(required = false) List<MultipartFile> newFiles,
-            @AuthenticationPrincipal User currentUser) { // Добавляем проверку прав
+            @PathVariable Long chatId,
+            @PathVariable Long messageId,
+            @ModelAttribute MessageUpdateRequest updateRequest,
+            @AuthenticationPrincipal User currentUser) {
 
-        MessageDTO message = messageService.getMessageById(id);
-
-        // Проверяем, что пользователь - автор сообщения
-        if (!message.getUserId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can't edit this message");
-        }
-
-        MessageDTO updatedMessage = messageService.updateMessage(id, newText, newFiles);
+        MessageDTO updatedMessage = messageService.updateMessage(
+                messageId,
+                currentUser.getId(),
+                updateRequest
+        );
         return ResponseEntity.ok(updatedMessage);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public List<MessageDTO> getAllMessages() {
-        return messageService.getAllMessages();
+    @GetMapping("/{messageId}")
+    @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
+    public ResponseEntity<MessageDTO> getMessage(
+            @PathVariable Long chatId,
+            @PathVariable Long messageId) {
+
+        return ResponseEntity.ok(messageService.getMessageById(messageId));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MessageDTO> getMessageById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(messageService.getMessageById(id));
-        } catch (MessageNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+    @DeleteMapping("/{messageId}")
+    @PreAuthorize("@messageService.isMessageAuthor(#messageId, #currentUser.id) or hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteMessage(
+            @PathVariable Long chatId,
+            @PathVariable Long messageId) {
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@AuthenticationPrincipal User currentUser, @PathVariable Long id) {
-
-        MessageDTO message = messageService.getMessageById(id);
-
-        // Проверяем, что пользователь - автор сообщения
-        if (!message.getUserId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can't edit this message");
-        }
-
-        messageService.deleteMessage(id);
+        messageService.deleteMessage(chatId, messageId);
         return ResponseEntity.noContent().build();
     }
 

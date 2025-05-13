@@ -2,6 +2,8 @@ package com.example.social_network01.repository;
 
 import com.example.social_network01.model.Chat;
 import com.example.social_network01.model.Message;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,4 +20,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "AND m.status = 'UNREAD' " +
             "AND m.user.id <> :userId")
     int countUnreadMessages(@Param("chatId") Long chatId, @Param("userId") Long userId);
+
+    Page<Message> findAllByChatId(Long chatId, Pageable pageable);
+
+    boolean existsByIdAndUserId(Long messageId, Long userId);
+
 }

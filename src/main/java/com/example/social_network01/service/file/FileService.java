@@ -25,4 +25,6 @@ public interface FileService {
         int dotIndex = originalName.lastIndexOf('.');
         return uuid + (dotIndex > 0 ? originalName.substring(dotIndex) : "");
     }
+    List<FileDTO> getFilesForMessage(Long messageId);
+    List<FileDTO> updateFiles(List<MultipartFile> newFiles, Message message);
 }
