@@ -1,6 +1,7 @@
 package com.example.social_network01.service.booking;
 
-import com.example.social_network01.dto.BookingDTO;
+import com.example.social_network01.dto.booking.BookingDTO;
+import com.example.social_network01.dto.booking.BookingRequestDTO;
 import com.example.social_network01.exception.custom.ResourceNotFoundException;
 import com.example.social_network01.exception.custom.ConflictException;
 import com.example.social_network01.model.Booking;
@@ -10,6 +11,7 @@ import com.example.social_network01.repository.BookingRepository;
 import com.example.social_network01.repository.UserRepository;
 import com.example.social_network01.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,21 +31,31 @@ public class BookingServiceImpl implements BookingService {
     private final ModelMapper modelMapper;
 
     @Override
-    public BookingDTO createBooking(BookingDTO bookingDTO, Long userId) {
-        Workspace workspace = workspaceRepository.findById(bookingDTO.getWorkspaceId())
+    @Transactional
+    public BookingDTO createBooking(BookingRequestDTO bookingRequestDTO, User user) {
+        // Получаем связанные сущности
+        Workspace workspace = workspaceRepository.findById(bookingRequestDTO.getWorkspaceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Workspace not found"));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        // Проверка временных конфликтов
+        checkBookingConflict(
+                workspace.getId(),
+                bookingRequestDTO.getBookingStart(),
+                bookingRequestDTO.getBookingEnd()
+        );
 
-        checkBookingConflict(workspace.getId(), bookingDTO.getBookingStart(), bookingDTO.getBookingEnd());
-
-        Booking booking = modelMapper.map(bookingDTO, Booking.class);
+        // Маппинг DTO -> Entity
+        Booking booking = modelMapper.map(bookingRequestDTO, Booking.class);
         booking.setWorkspace(workspace);
         booking.setUser(user);
         booking.setCreatedWhen(LocalDateTime.now());
 
+
+        // Сохранение и возврат результата
         Booking savedBooking = bookingRepository.save(booking);
+
+        Hibernate.initialize(savedBooking.getUser());
+        Hibernate.initialize(savedBooking.getWorkspace());
         return modelMapper.map(savedBooking, BookingDTO.class);
     }
 
@@ -63,6 +75,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public void deleteBooking(Long id, Long userId) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));

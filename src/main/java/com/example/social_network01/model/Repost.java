@@ -3,6 +3,7 @@ package com.example.social_network01.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Schema(hidden = true)
 @Entity
@@ -14,6 +15,7 @@ public class Repost {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @ToString.Exclude
     private Post post;
 
     @ManyToOne

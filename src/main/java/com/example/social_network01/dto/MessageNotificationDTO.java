@@ -1,5 +1,6 @@
 package com.example.social_network01.dto;
 
+import com.example.social_network01.dto.message.MessageDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;

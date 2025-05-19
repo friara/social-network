@@ -1,5 +1,6 @@
-package com.example.social_network01.dto;
+package com.example.social_network01.dto.post;
 
+import com.example.social_network01.dto.MediaDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,8 +13,8 @@ public class PostResponseDTO {
     private String text;
     private List<MediaDTO> media;
     private Long userId;
-    private Long likeCount;
-    private Long commentCount;
-    private Long repostCount;
+    private Integer likeCount;
+    private Integer commentCount;
+    private Integer repostCount;
     private boolean liked;
 }

@@ -13,6 +13,9 @@ public class Workspace {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String workspaceName;
+
     @Column(nullable = false)
     private boolean isAvailable;
 

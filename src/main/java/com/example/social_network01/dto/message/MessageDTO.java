@@ -1,6 +1,6 @@
-package com.example.social_network01.dto;
+package com.example.social_network01.dto.message;
 
-import com.example.social_network01.model.File;
+import com.example.social_network01.dto.FileDTO;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;

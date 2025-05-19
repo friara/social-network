@@ -9,11 +9,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.time.ZoneId;
+import java.util.TimeZone;
+
 @SpringBootApplication
 @EntityScan("com.example.social_network01.model")
 public class SocialNetwork01Application {
 
 	public static void main(String[] args) {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // Принудительная установка UTC
+		System.out.println("Часовой пояс JVM: " + ZoneId.systemDefault());
 		SpringApplication.run(SocialNetwork01Application.class, args);
 	}
 

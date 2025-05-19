@@ -1,7 +1,7 @@
 package com.example.social_network01.controller;
 
-import com.example.social_network01.dto.PostDTO;
-import com.example.social_network01.dto.PostResponseDTO;
+import com.example.social_network01.dto.post.PostDTO;
+import com.example.social_network01.dto.post.PostResponseDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;

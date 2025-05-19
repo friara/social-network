@@ -22,6 +22,7 @@ public class RepostController {
 
     @PostMapping
     public RepostDTO createRepost(@AuthenticationPrincipal User currentUser,
+                                  @PathVariable Long postId,
                                   @RequestBody RepostDTO repostDTO) {
         repostDTO.setUserId(currentUser.getId());
         return repostService.createRepost(repostDTO);
@@ -33,7 +34,8 @@ public class RepostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RepostDTO> getRepostById(@PathVariable Long id) {
+    public ResponseEntity<RepostDTO> getRepostById(@PathVariable Long postId,
+                                                   @PathVariable Long id) {
         RepostDTO repostDTO = repostService.getRepostById(id);
         if (repostDTO != null) {
             return ResponseEntity.ok(repostDTO);
@@ -43,7 +45,9 @@ public class RepostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRepost(@AuthenticationPrincipal User currentUser, @PathVariable Long id) {
+    public ResponseEntity<Void> deleteRepost(@AuthenticationPrincipal User currentUser,
+                                             @PathVariable Long postId,
+                                             @PathVariable Long id) {
 
         RepostDTO repost = repostService.getRepostById(id);
 

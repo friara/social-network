@@ -1,10 +1,9 @@
-package com.example.social_network01.dto;
+package com.example.social_network01.dto.post;
 
-import jakarta.validation.Valid;
+import com.example.social_network01.dto.MediaDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;

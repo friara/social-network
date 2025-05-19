@@ -1,6 +1,8 @@
 package com.example.social_network01.service.booking;
 
-import com.example.social_network01.dto.BookingDTO;
+import com.example.social_network01.dto.booking.BookingDTO;
+import com.example.social_network01.dto.booking.BookingRequestDTO;
+import com.example.social_network01.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,7 +12,7 @@ import java.util.List;
 public interface BookingService {
 
 
-    BookingDTO createBooking(BookingDTO bookingDTO, Long userId);
+    BookingDTO createBooking(BookingRequestDTO bookingDTO, User user);
 
     Page<BookingDTO> getAllBookings(Pageable pageable);
 

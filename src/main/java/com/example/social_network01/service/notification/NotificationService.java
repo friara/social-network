@@ -1,9 +1,7 @@
 package com.example.social_network01.service.notification;
 
-import com.example.social_network01.dto.MessageDTO;
 import com.example.social_network01.dto.MessageNotificationDTO;
 import com.example.social_network01.exception.custom.ResourceNotFoundException;
-import com.example.social_network01.model.MessageNotification;
 import com.example.social_network01.model.User;
 import com.example.social_network01.repository.MessageNotificationRepository;
 import lombok.RequiredArgsConstructor;

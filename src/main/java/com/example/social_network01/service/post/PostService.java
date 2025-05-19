@@ -1,7 +1,7 @@
 package com.example.social_network01.service.post;
 
-import com.example.social_network01.dto.PostDTO;
-import com.example.social_network01.dto.PostResponseDTO;
+import com.example.social_network01.dto.post.PostDTO;
+import com.example.social_network01.dto.post.PostResponseDTO;
 import com.example.social_network01.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,7 +1,6 @@
-package com.example.social_network01.dto;
+package com.example.social_network01.dto.booking;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Past;
+import com.example.social_network01.dto.UserDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;

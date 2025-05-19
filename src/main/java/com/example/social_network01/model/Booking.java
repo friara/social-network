@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Schema(hidden = true)
 @Entity

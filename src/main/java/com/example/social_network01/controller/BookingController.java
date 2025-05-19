@@ -1,13 +1,13 @@
 package com.example.social_network01.controller;
 
-import com.example.social_network01.dto.BookingDTO;
+import com.example.social_network01.dto.booking.BookingDTO;
+import com.example.social_network01.dto.booking.BookingRequestDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.booking.BookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,15 +27,15 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingDTO> createBooking(
-            @RequestBody @Valid BookingDTO bookingDTO,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = Long.parseLong(userDetails.getUsername());
-        BookingDTO createdBooking = bookingService.createBooking(bookingDTO, userId);
+            @RequestBody @Valid BookingRequestDTO bookingDTO,
+            @AuthenticationPrincipal User user) {
+        BookingDTO createdBooking = bookingService.createBooking(bookingDTO, user);
 
         URI location = URI.create("/api/bookings/" + createdBooking.getId());
         return ResponseEntity.created(location).body(createdBooking);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<Page<BookingDTO>> getAllBookings(Pageable pageable) {
         return ResponseEntity.ok(bookingService.getAllBookings(pageable));

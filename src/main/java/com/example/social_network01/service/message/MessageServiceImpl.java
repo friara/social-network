@@ -1,8 +1,7 @@
 package com.example.social_network01.service.message;
 
-import com.example.social_network01.dto.MessageDTO;
-import com.example.social_network01.dto.message.MessageCreateRequest;
-import com.example.social_network01.dto.message.MessageUpdateRequest;
+import com.example.social_network01.dto.message.MessageDTO;
+import com.example.social_network01.dto.message.MessagRequestDTO;
 import com.example.social_network01.exception.custom.ChatNotFoundException;
 import com.example.social_network01.exception.custom.MessageNotFoundException;
 import com.example.social_network01.exception.custom.UserNotFoundException;
@@ -49,7 +48,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
-    public MessageDTO createMessage(Long chatId, Long userId, MessageCreateRequest request) {
+    public MessageDTO createMessage(Long chatId, Long userId, MessagRequestDTO request) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ChatNotFoundException("Chat not found with id " + chatId));
         User user = userRepository.findById(userId)
@@ -75,7 +74,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
-    public MessageDTO updateMessage(Long messageId, Long userId, MessageUpdateRequest request) {
+    public MessageDTO updateMessage(Long messageId, Long userId, MessagRequestDTO request) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException("Message not found with id " + messageId));
 

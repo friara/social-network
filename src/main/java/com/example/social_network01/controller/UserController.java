@@ -31,9 +31,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private AvatarService avatarService;
-
 
     @GetMapping
     public List<UserDTO> getAllUsers() {

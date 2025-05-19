@@ -1,17 +1,23 @@
 package com.example.social_network01.config;
 
 import com.example.social_network01.dto.*;
+import com.example.social_network01.dto.booking.BookingDTO;
+import com.example.social_network01.dto.message.MessageDTO;
+import com.example.social_network01.dto.post.PostResponseDTO;
 import com.example.social_network01.exception.custom.ResourceNotFoundException;
 import com.example.social_network01.model.*;
 import com.example.social_network01.repository.RoleRepository;
 import com.example.social_network01.repository.UserRepository;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.management.relation.RoleNotFoundException;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,14 +35,25 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> {
                     mapper.map(src -> src.getPost().getId(), MediaDTO::setPostId);
                     mapper.using(ctx -> convertToUrl((String) ctx.getSource(), "media"))
-                            .map(Media::getFileName, MediaDTO::setDownloadUrl); // Используем fileName
+                            .map(Media::getFileName, MediaDTO::setDownloadUrl);
                 });
+
+        // UserDTO -> User
+        modelMapper.emptyTypeMap(UserDTO.class, User.class)
+                .addMappings(mapper -> {
+                    mapper.skip(User::setId);
+                    mapper.skip(User::setPassword);
+                    mapper.skip(User::setRole); // Пропускаем сначала поле role
+                })
+                .implicitMappings(); // Добавляем неявные маппинги для остальных полей
 
         // User -> UserDTO
         modelMapper.typeMap(User.class, UserDTO.class)
                 .addMappings(mapper -> {
-                    mapper.using(ctx -> convertToUrl((String) ctx.getSource(), "avatars"))
-                            .map(User::getAvatarPath, UserDTO::setAvatarUrl);
+                    mapper.using(ctx -> {
+                        String path = (String) ctx.getSource();
+                        return (path != null) ? convertToUrl(path, "avatars") : null;
+                    }).map(User::getAvatarPath, UserDTO::setAvatarUrl);
 
                     // Маппинг роли
                     mapper.map(src -> src.getRole().getName(), UserDTO::setRoleName);
@@ -58,6 +75,14 @@ public class ModelMapperConfig {
                     }).map(UserDTO::getRoleName, User::setRole);
                 });
 
+        // UserExtendedDTO -> User
+        modelMapper.emptyTypeMap(UserExtendedDTO.class, User.class)
+                .addMappings(mapper -> {
+                    mapper.skip(User::setId);
+                    mapper.skip(User::setRole); // Пропускаем сначала поле role
+                })
+                .implicitMappings();
+
         // Маппинг для UserExtendedDTO
         modelMapper.typeMap(UserExtendedDTO.class, User.class)
                 .addMappings(mapper -> {
@@ -71,15 +96,21 @@ public class ModelMapperConfig {
                                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
                     }).map(UserExtendedDTO::getRoleName, User::setRole);
                 });
-
+        Converter<Collection, Integer> collectionToSize = c -> (c.getSource() != null) ? c.getSource().size() : 0;
         // Маппинг для Post -> PostResponseDTO
         modelMapper.typeMap(Post.class, PostResponseDTO.class)
                 .addMappings(mapper -> {
                     mapper.map(src -> src.getUser().getId(), PostResponseDTO::setUserId);
-                    mapper.map(src -> src.getComments() != null ? src.getComments().size() : 0, PostResponseDTO::setCommentCount);
-                    mapper.map(src -> src.getLikes() != null ? src.getLikes().size() : 0, PostResponseDTO::setLikeCount);
-                    mapper.map(src -> src.getReposts() != null ? src.getReposts().size() : 0, PostResponseDTO::setRepostCount);
+                    mapper.using(collectionToSize).map(Post::getLikes, PostResponseDTO::setLikeCount);
+                    mapper.using(collectionToSize).map(Post::getComments, PostResponseDTO::setCommentCount);
+                    mapper.using(collectionToSize).map(Post::getReposts, PostResponseDTO::setRepostCount);
                     mapper.skip(PostResponseDTO::setLiked);
+                    // Маппинг коллекции Media → MediaDTO
+                    mapper.using(ctx ->
+                            ((Collection<Media>) ctx.getSource()).stream()
+                                    .map(media -> modelMapper.map(media, MediaDTO.class))
+                                    .collect(Collectors.toList())
+                    ).map(Post::getMedia, PostResponseDTO::setMedia);
                 });
 
 
@@ -116,6 +147,45 @@ public class ModelMapperConfig {
             mapper.skip(Chat::setCreatedBy);
         });
 
+
+
+
+        // Конвертер для списка бронирований (Booking -> BookingDTO с фильтрацией)
+        Converter<List<Booking>, List<BookingDTO>> bookingConverter = ctx -> {
+            List<Booking> bookings = ctx.getSource();
+            if (bookings == null) {
+                return Collections.emptyList();
+            }
+            LocalDate today = LocalDate.now();
+            return bookings.stream()
+                    .filter(booking -> booking.getBookingStart() != null && !booking.getBookingStart().isBefore(today.atStartOfDay()))
+                    .map(booking -> modelMapper.map(booking, BookingDTO.class))
+                    .collect(Collectors.toList());
+        };
+
+        // Маппинг Workspace -> WorkspaceDTO
+        modelMapper.typeMap(Workspace.class, WorkspaceDTO.class)
+                .addMappings(mapper -> {
+                    mapper.using(bookingConverter).map(Workspace::getBookings, WorkspaceDTO::setCurrentBookings);
+                    mapper.map(src -> src.isAvailable(), WorkspaceDTO::setAvailable); // Маппинг boolean (если нужно)
+                });
+
+        modelMapper.typeMap(Booking.class, BookingDTO.class)
+                .addMappings(mapper -> {
+                    mapper.map(src -> src.getWorkspace().getId(), BookingDTO::setWorkspaceId);
+//                    mapper.using(ctx -> {
+//                        Booking booking = (Booking) ctx.getSource();
+//                        User user = booking.getUser();
+//                        if (user == null) return null;
+//                        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+//                        userDTO.setAvatarUrl(convertToUrl(user.getAvatarPath(), "avatars"));
+//                        return userDTO;
+//                    }).map(Booking::getUser, BookingDTO::setUser);
+                    mapper.map(src -> src.getUser().getId(), BookingDTO::setUserId);
+                });
+
+        //modelMapper.validate();
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
         return modelMapper;
     }
 

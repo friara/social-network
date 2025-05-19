@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -17,11 +18,13 @@ public class Like {
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
     private User user;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
+    @ToString.Exclude
     private Post post;
 
     @Column(nullable = false)

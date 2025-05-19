@@ -1,19 +1,13 @@
 package com.example.social_network01.controller;
 
-import com.example.social_network01.dto.MessageDTO;
-import com.example.social_network01.dto.message.MessageCreateRequest;
-import com.example.social_network01.dto.message.MessageUpdateRequest;
-import com.example.social_network01.exception.custom.ChatNotFoundException;
-import com.example.social_network01.exception.custom.MessageNotFoundException;
-import com.example.social_network01.exception.custom.UserNotFoundException;
-import com.example.social_network01.model.Chat;
+import com.example.social_network01.dto.message.MessageDTO;
+import com.example.social_network01.dto.message.MessagRequestDTO;
 import com.example.social_network01.model.User;
-import com.example.social_network01.repository.ChatRepository;
-import com.example.social_network01.repository.UserRepository;
 import com.example.social_network01.service.message.MessageService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,14 +16,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,7 +45,19 @@ public class MessageController {
     @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
     public ResponseEntity<MessageDTO> createMessage(
             @PathVariable Long chatId,
-            @RequestBody @Valid MessageCreateRequest request,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Данные для создания сообщения",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            schema = @Schema(implementation = MessagRequestDTO.class),
+                            encoding = @Encoding(
+                                    name = "files",
+                                    contentType = "application/octet-stream"
+                            )
+                    )
+            )
+            @Valid MessagRequestDTO request,
             @AuthenticationPrincipal User currentUser) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -68,13 +69,25 @@ public class MessageController {
     public ResponseEntity<MessageDTO> updateMessage(
             @PathVariable Long chatId,
             @PathVariable Long messageId,
-            @ModelAttribute MessageUpdateRequest updateRequest,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Данные для создания сообщения",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            schema = @Schema(implementation = MessagRequestDTO.class),
+                            encoding = @Encoding(
+                                    name = "files",
+                                    contentType = "application/octet-stream"
+                            )
+                    )
+            )
+            @Valid MessagRequestDTO request,
             @AuthenticationPrincipal User currentUser) {
 
         MessageDTO updatedMessage = messageService.updateMessage(
                 messageId,
                 currentUser.getId(),
-                updateRequest
+                request
         );
         return ResponseEntity.ok(updatedMessage);
     }
