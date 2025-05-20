@@ -45,10 +45,11 @@ public class PostServiceImpl implements PostService {
     // Создание нового поста с прикрепленными медиафайлами.
     @Override
     @Transactional
-    public PostDTO createPost(String text, List<MultipartFile> files) {
+    public PostDTO createPost(String text, List<MultipartFile> files, User user) {
         Post post = new Post();
         post.setText(text);
         post.setCreatedWhen(LocalDateTime.now());
+        post.setUser(user);
         post = postRepository.save(post);
 
         List<Media> mediaList = (files != null && !files.isEmpty())

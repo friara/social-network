@@ -20,17 +20,26 @@ public class Media {
         public static MediaType fromMimeType(String mimeType) {
             if (mimeType == null) return OTHER;
 
-            String primaryType = mimeType.split("/")[0];
-            return switch (primaryType) {
-                case "image" -> IMAGE;
-                case "video" -> VIDEO;
-                case "audio" -> AUDIO;
-                default -> switch (mimeType) {
-                    case "application/pdf", "text/plain" -> DOCUMENT;
-                    case "application/zip", "application/x-rar-compressed" -> ARCHIVE;
-                    default -> OTHER;
-                };
-            };
+            String primaryType = mimeType.contains("/")
+                    ? mimeType.split("/")[0]
+                    : "unknown";
+
+            switch (primaryType) {
+                case "image": return IMAGE;
+                case "video": return VIDEO;
+                case "audio": return AUDIO;
+                default:
+                    if (mimeType.equals("application/pdf")
+                            || mimeType.startsWith("text/")) {
+                        return DOCUMENT;
+                    } else if (mimeType.startsWith("application/zip")
+                            || mimeType.startsWith("application/x-rar")
+                            || mimeType.startsWith("application/x-7z")) {
+                        return ARCHIVE;
+                    } else {
+                        return OTHER;
+                    }
+            }
         }
     }
 

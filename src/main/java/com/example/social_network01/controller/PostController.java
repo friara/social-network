@@ -29,8 +29,9 @@ public class PostController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PostDTO createPost(
             @RequestParam("text") String text,
-            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
-        return postService.createPost(text, files);
+            @RequestParam(value = "files", required = false) List<MultipartFile> files,
+            @AuthenticationPrincipal User currentUser) {
+        return postService.createPost(text, files, currentUser);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface PostService {
     PostDTO createPost(PostDTO postDTO);
-    PostDTO createPost(String text, List<MultipartFile> files);
+    PostDTO createPost(String text, List<MultipartFile> files, User user);
     PostDTO updatePost(PostDTO postDTO, List<MultipartFile> files);
     PostDTO updatePost(PostDTO postDTO);
     List<PostResponseDTO> getAllPosts();

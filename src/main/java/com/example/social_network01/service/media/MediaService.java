@@ -66,11 +66,12 @@ public class MediaService {
                         Path targetLocation = storagePath.resolve(filename);
                         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-                        Media media = modelMapper.map(file, Media.class);
+                        Media media = new Media();
                         media.setPost(post);
-                        media.setFileName(filename); // Установка имени файла
+                        media.setFileName(filename);
                         media.setMediaType(Media.MediaType.fromMimeType(file.getContentType())); // Определение типа
-
+                        media.setMimeType(file.getContentType());
+                        media.setFileSize(file.getSize());
                         validateMedia(media, file);
                         return mediaRepository.save(media);
                     } catch (IOException e) {
