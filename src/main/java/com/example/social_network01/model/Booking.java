@@ -3,6 +3,7 @@ package com.example.social_network01.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -27,7 +28,7 @@ public class Booking {
     private LocalDateTime bookingStart;
     @Column(nullable = false)
     private LocalDateTime bookingEnd;
-    @Past
+    @PastOrPresent
     private LocalDateTime createdWhen;
 }
 

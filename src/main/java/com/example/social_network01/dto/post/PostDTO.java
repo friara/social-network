@@ -12,8 +12,6 @@ import java.util.List;
 public class PostDTO {
     private Long id;
 
-    @NotNull(message = "Creation date cannot be null")
-    @PastOrPresent(message = "Creation date must be in the past or present")
     private LocalDateTime createdWhen;
 
     @NotBlank(message = "Text cannot be empty")

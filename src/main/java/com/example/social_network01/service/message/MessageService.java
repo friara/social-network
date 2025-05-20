@@ -12,8 +12,8 @@ public interface MessageService {
 //    void deleteMessage(Long id);
 //    MessageDTO updateMessage(Long id, String newText, List<MultipartFile> newFiles);
     Page<MessageDTO> getMessagesByChatId(Long chatId, Pageable pageable);
-    MessageDTO createMessage(Long chatId, Long userId, MessagRequestDTO request);
-    MessageDTO updateMessage(Long messageId, Long userId, MessagRequestDTO request);
+    MessageDTO createMessage(Long chatId, Long userId, MessageRequestDTO request);
+    MessageDTO updateMessage(Long messageId, Long userId, MessageRequestDTO request);
     void deleteMessage(Long messageId, Long userId);
 
     boolean isMessageAuthor(Long messageId, Long userId);

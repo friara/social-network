@@ -46,7 +46,6 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                     .requestMatchers("/api/users/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             )
-//            .oauth2ResourceServer((oauth2) -> oauth2.jwt(withDefaults()));
             .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwt -> jwt
                     .jwtAuthenticationConverter(jwtAuthConverter)));
     return http.build();

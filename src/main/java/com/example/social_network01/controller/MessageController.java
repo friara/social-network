@@ -1,7 +1,7 @@
 package com.example.social_network01.controller;
 
 import com.example.social_network01.dto.message.MessageDTO;
-import com.example.social_network01.dto.message.MessagRequestDTO;
+import com.example.social_network01.dto.message.MessageRequestDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.message.MessageService;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,7 +33,8 @@ public class MessageController {
             @PathVariable Long chatId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdWhen,desc") String[] sort) {
+            @RequestParam(defaultValue = "createdWhen,desc") String[] sort,
+            @AuthenticationPrincipal User currentUser) {
 
         Sort.Direction direction = sort[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort[0]));
@@ -50,14 +51,14 @@ public class MessageController {
                     required = true,
                     content = @Content(
                             mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                            schema = @Schema(implementation = MessagRequestDTO.class),
+                            schema = @Schema(implementation = MessageRequestDTO.class),
                             encoding = @Encoding(
                                     name = "files",
                                     contentType = "application/octet-stream"
                             )
                     )
             )
-            @Valid MessagRequestDTO request,
+            @Valid MessageRequestDTO request,
             @AuthenticationPrincipal User currentUser) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -74,14 +75,14 @@ public class MessageController {
                     required = true,
                     content = @Content(
                             mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                            schema = @Schema(implementation = MessagRequestDTO.class),
+                            schema = @Schema(implementation = MessageRequestDTO.class),
                             encoding = @Encoding(
                                     name = "files",
                                     contentType = "application/octet-stream"
                             )
                     )
             )
-            @Valid MessagRequestDTO request,
+            @Valid MessageRequestDTO request,
             @AuthenticationPrincipal User currentUser) {
 
         MessageDTO updatedMessage = messageService.updateMessage(
@@ -96,7 +97,8 @@ public class MessageController {
     @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
     public ResponseEntity<MessageDTO> getMessage(
             @PathVariable Long chatId,
-            @PathVariable Long messageId) {
+            @PathVariable Long messageId,
+            @AuthenticationPrincipal User currentUser) {
 
         return ResponseEntity.ok(messageService.getMessageById(messageId));
     }
@@ -105,7 +107,8 @@ public class MessageController {
     @PreAuthorize("@messageService.isMessageAuthor(#messageId, #currentUser.id) or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteMessage(
             @PathVariable Long chatId,
-            @PathVariable Long messageId) {
+            @PathVariable Long messageId,
+            @AuthenticationPrincipal User currentUser) {
 
         messageService.deleteMessage(chatId, messageId);
         return ResponseEntity.noContent().build();

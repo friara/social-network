@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Data
-public class MessagRequestDTO {
+public class MessageRequestDTO {
 
     private String text;
 
