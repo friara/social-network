@@ -37,11 +37,13 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PostDTO updatePost(
-            @PathVariable("id") Long id,
-            @ModelAttribute PostDTO postDTO,
-            @RequestParam(value = "files", required = false) List<MultipartFile> files
+            @PathVariable Long id,
+            @RequestParam String text, // Поля DTO как отдельные параметры
+            @RequestParam(required = false) List<MultipartFile> files
     ) {
+        PostDTO postDTO = new PostDTO();
         postDTO.setId(id);
+        postDTO.setText(text);
         return postService.updatePost(postDTO, files);
     }
 

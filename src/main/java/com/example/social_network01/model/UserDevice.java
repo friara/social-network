@@ -22,5 +22,7 @@ public class UserDevice {
     @Column(unique = true)
     private String fcmToken;
 
-    private LocalDateTime lastUpdated = LocalDateTime.now();
+    private String deviceId; // Уникальный идентификатор устройства (например, IMEI или UUID)
+
+    private LocalDateTime lastActive = LocalDateTime.now();
 }

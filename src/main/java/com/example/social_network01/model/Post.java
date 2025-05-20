@@ -35,21 +35,21 @@ public class Post {
     @Lob
     private String text;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
-    private List<Comment> comments  = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
-    private List<Like> likes  = new ArrayList<>();
+    private List<Like> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
-    private List<Repost> reposts  = new ArrayList<>();
+    private List<Repost> reposts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonManagedReference
-    private List<Media> media  = new ArrayList<>();
+    private List<Media> media = new ArrayList<>();
 
     @Transient
     @JsonIgnore

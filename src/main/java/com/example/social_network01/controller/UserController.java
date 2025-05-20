@@ -4,6 +4,7 @@ import com.example.social_network01.dto.UserExtendedDTO;
 import com.example.social_network01.dto.UserDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.media.AvatarService;
+import com.example.social_network01.service.notification.UserDeviceService;
 import com.example.social_network01.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -30,6 +32,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserDeviceService userDeviceService;
 
 
     @GetMapping
@@ -125,6 +130,27 @@ public class UserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return userService.searchByFIO(query, PageRequest.of(page, size));
+    }
+
+
+    @PostMapping("/fcm-token")
+    public ResponseEntity<?> saveFcmToken(
+            @AuthenticationPrincipal User user,
+            @RequestBody Map<String, String> request
+    ) {
+        String fcmToken = request.get("fcmToken");
+        String deviceId = request.get("deviceId"); // Клиент должен генерировать уникальный ID
+
+        if (fcmToken == null || deviceId == null) {
+            return ResponseEntity.badRequest().body("FCM token and device ID are required");
+        }
+
+        try {
+            userDeviceService.saveOrUpdateDevice(user, fcmToken, deviceId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error saving device");
+        }
     }
 
 }
