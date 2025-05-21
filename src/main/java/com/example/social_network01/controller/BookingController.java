@@ -41,6 +41,11 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getAllBookings(pageable));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<Page<BookingDTO>> getBookings(@AuthenticationPrincipal User user, Pageable pageable) {
+        return ResponseEntity.ok(bookingService.getBookingsFromToday(user, pageable));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<BookingDTO> getBookingById(@PathVariable Long id) {
         return ResponseEntity.ok(bookingService.getBookingById(id));
@@ -52,13 +57,5 @@ public class BookingController {
             @AuthenticationPrincipal User user) {
         bookingService.deleteBooking(id, user.getId());
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/availability/{workspaceId}")
-    public ResponseEntity<List<LocalDateTime>> checkAvailability(
-            @PathVariable Long workspaceId,
-            @RequestParam LocalDateTime date) {
-        List<LocalDateTime> slots = bookingService.getAvailableSlots(workspaceId, date);
-        return ResponseEntity.ok(slots);
     }
 }

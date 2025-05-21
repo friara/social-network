@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.List;
 
 @Service
@@ -48,7 +48,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = modelMapper.map(bookingRequestDTO, Booking.class);
         booking.setWorkspace(workspace);
         booking.setUser(user);
-        booking.setCreatedWhen(LocalDateTime.now());
+        booking.setCreatedWhen(Instant.now());
 
 
         // Сохранение и возврат результата
@@ -64,6 +64,28 @@ public class BookingServiceImpl implements BookingService {
     public Page<BookingDTO> getAllBookings(Pageable pageable) {
         return bookingRepository.findAll(pageable)
                 .map(booking -> modelMapper.map(booking, BookingDTO.class));
+    }
+
+    @Override
+    public Page<BookingDTO> getUserBookings(User user, Pageable pageable) {
+        return bookingRepository.findAllByUser(user, pageable)
+                .map(booking -> modelMapper.map(booking, BookingDTO.class));
+    }
+
+    @Override
+    public Page<BookingDTO> getBookingsFromToday(User user, Pageable pageable) {
+        Instant startOfDay = LocalDate.now()
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant();
+
+        return bookingRepository.findBookingsFromTodayByUser(user, startOfDay, pageable)
+                .map(booking -> {
+                    BookingDTO dto = modelMapper.map(booking, BookingDTO.class);
+//                    // Явно устанавливаем временную зону
+//                    dto.setBookingStart(booking.getBookingStart().atZone(ZoneOffset.UTC));
+//                    dto.setBookingEnd(booking.getBookingEnd().atZone(ZoneOffset.UTC));
+                    return dto;
+                });
     }
 
     @Override
@@ -87,15 +109,8 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.delete(booking);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<LocalDateTime> getAvailableSlots(Long workspaceId, LocalDateTime date) {
-        // Реализация проверки доступных слотов времени
-        // (может быть сложной логикой в зависимости от требований)
-        return List.of();
-    }
 
-    private void checkBookingConflict(Long workspaceId, LocalDateTime start, LocalDateTime end) {
+    private void checkBookingConflict(Long workspaceId, Instant start, Instant end) {
         boolean hasConflict = bookingRepository.existsByWorkspaceIdAndTimeRange(
                 workspaceId, start, end);
 

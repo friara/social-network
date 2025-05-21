@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
@@ -25,10 +27,12 @@ public class Booking {
     private User user;
 
     @Column(nullable = false)
-    private LocalDateTime bookingStart;
+    private Instant bookingStart;  // Хранит время в UTC
+
     @Column(nullable = false)
-    private LocalDateTime bookingEnd;
+    private Instant bookingEnd;
+
     @PastOrPresent
-    private LocalDateTime createdWhen;
+    private Instant createdWhen;
 }
 

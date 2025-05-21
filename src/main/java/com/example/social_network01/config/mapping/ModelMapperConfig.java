@@ -1,4 +1,4 @@
-package com.example.social_network01.config;
+package com.example.social_network01.config.mapping;
 
 import com.example.social_network01.dto.*;
 import com.example.social_network01.dto.booking.BookingDTO;
@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -148,17 +150,20 @@ public class ModelMapperConfig {
         });
 
 
-
-
         // Конвертер для списка бронирований (Booking -> BookingDTO с фильтрацией)
         Converter<List<Booking>, List<BookingDTO>> bookingConverter = ctx -> {
             List<Booking> bookings = ctx.getSource();
             if (bookings == null) {
                 return Collections.emptyList();
             }
-            LocalDate today = LocalDate.now();
+            // Получаем начало текущего дня в системной временной зоне и конвертируем в Instant
+            Instant startOfDay = LocalDate.now()
+                    .atStartOfDay(ZoneId.systemDefault())
+                    .toInstant();
+
             return bookings.stream()
-                    .filter(booking -> booking.getBookingStart() != null && !booking.getBookingStart().isBefore(today.atStartOfDay()))
+                    .filter(booking -> booking.getBookingStart() != null
+                            && !booking.getBookingStart().isBefore(startOfDay))
                     .map(booking -> modelMapper.map(booking, BookingDTO.class))
                     .collect(Collectors.toList());
         };

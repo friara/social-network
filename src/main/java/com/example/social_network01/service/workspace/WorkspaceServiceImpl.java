@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,7 +82,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public List<WorkspaceDTO> getAvailableWorkspaces(LocalDateTime start, LocalDateTime end) {
+    public List<WorkspaceDTO> getAvailableWorkspaces(Instant start, Instant end) {
         // Проверка валидности временного интервала
         if (start.isAfter(end)) {
             throw new IllegalArgumentException("Start time must be before end time");
@@ -103,7 +104,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 .collect(Collectors.toList());
     }
 
-    private boolean hasConflictingBookings(Long workspaceId, LocalDateTime start, LocalDateTime end) {
+    private boolean hasConflictingBookings(Long workspaceId, Instant start, Instant end) {
         return bookingRepository.existsByWorkspaceIdAndTimeRange(workspaceId, start, end);
     }
 

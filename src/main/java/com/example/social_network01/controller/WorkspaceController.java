@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -72,8 +73,8 @@ public class WorkspaceController {
 
     @GetMapping("/available")
     public ResponseEntity<List<WorkspaceDTO>> getAvailableWorkspaces(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant end) {
         List<WorkspaceDTO> availableWorkspaces = workspaceService.getAvailableWorkspaces(start, end);
         return ResponseEntity.ok(availableWorkspaces);
     }
