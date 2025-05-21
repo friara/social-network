@@ -3,12 +3,14 @@ package com.example.social_network01.service.workspace;
 import com.example.social_network01.dto.WorkspaceDTO;
 import com.example.social_network01.exception.custom.ResourceNotFoundException;
 import com.example.social_network01.model.Workspace;
+import com.example.social_network01.repository.BookingRepository;
 import com.example.social_network01.repository.WorkspaceRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,12 +18,14 @@ import java.util.stream.Collectors;
 public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
+    private final BookingRepository bookingRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository,
+    public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository, BookingRepository bookingRepository,
                                 ModelMapper modelMapper) {
         this.workspaceRepository = workspaceRepository;
+        this.bookingRepository = bookingRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -74,6 +78,33 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorkspaceDTO> getAvailableWorkspaces(LocalDateTime start, LocalDateTime end) {
+        // Проверка валидности временного интервала
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Start time must be before end time");
+        }
+
+        // Получаем все рабочие места
+        List<Workspace> allWorkspaces = workspaceRepository.findAll();
+
+        return allWorkspaces.stream()
+                .filter(workspace ->
+                        workspace.isAvailable() &&
+                                !hasConflictingBookings(workspace.getId(), start, end)
+                )
+                .map(workspace -> {
+                    WorkspaceDTO dto = modelMapper.map(workspace, WorkspaceDTO.class);
+                    dto.setAvailable(true); // Явно устанавливаем доступность
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private boolean hasConflictingBookings(Long workspaceId, LocalDateTime start, LocalDateTime end) {
+        return bookingRepository.existsByWorkspaceIdAndTimeRange(workspaceId, start, end);
     }
 
     private WorkspaceDTO convertToDto(Workspace workspace) {

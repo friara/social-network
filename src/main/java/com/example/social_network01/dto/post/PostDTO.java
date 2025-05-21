@@ -1,6 +1,7 @@
 package com.example.social_network01.dto.post;
 
 import com.example.social_network01.dto.MediaDTO;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -33,11 +34,12 @@ public class PostDTO {
     )
     private String text;
 
-    @Schema(
-            description = "Список медиа-вложений",
-            implementation = MediaDTO.class,
-            type = "array"
-    )
+//    @Schema(
+//            description = "Список медиа-вложений",
+//            type = "array", // Явно указываем тип как массив
+//            implementation = MediaDTO.class // Тип элементов массива
+//    )
+    @ArraySchema(schema = @Schema(implementation = MediaDTO.class))
     private List<MediaDTO> media;
 
     @Schema(

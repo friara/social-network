@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -69,8 +71,10 @@ public class WorkspaceController {
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<WorkspaceDTO>> getAvailableWorkspaces() {
-        List<WorkspaceDTO> availableWorkspaces = workspaceService.getAvailableWorkspaces();
+    public ResponseEntity<List<WorkspaceDTO>> getAvailableWorkspaces(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+        List<WorkspaceDTO> availableWorkspaces = workspaceService.getAvailableWorkspaces(start, end);
         return ResponseEntity.ok(availableWorkspaces);
     }
 }
