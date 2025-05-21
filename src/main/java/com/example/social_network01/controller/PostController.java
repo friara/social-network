@@ -39,12 +39,13 @@ public class PostController {
     public PostDTO updatePost(
             @PathVariable Long id,
             @RequestParam String text, // Поля DTO как отдельные параметры
-            @RequestParam(required = false) List<MultipartFile> files
+            @RequestParam(required = false) List<MultipartFile> files,
+            @RequestParam Boolean isMediaUpdated
     ) {
         PostDTO postDTO = new PostDTO();
         postDTO.setId(id);
         postDTO.setText(text);
-        return postService.updatePost(postDTO, files);
+        return postService.updatePost(postDTO, files, isMediaUpdated);
     }
 
     @GetMapping

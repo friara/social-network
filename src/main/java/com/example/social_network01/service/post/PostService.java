@@ -12,8 +12,8 @@ import java.util.List;
 public interface PostService {
     PostDTO createPost(PostDTO postDTO);
     PostDTO createPost(String text, List<MultipartFile> files, User user);
-    PostDTO updatePost(PostDTO postDTO, List<MultipartFile> files);
-    PostDTO updatePost(PostDTO postDTO);
+    PostDTO updatePost(PostDTO postDTO, List<MultipartFile> files, Boolean isMediaUpdated);
+
     List<PostResponseDTO> getAllPosts();
     PostDTO getPostById(Long id);
     void deletePost(Long id);

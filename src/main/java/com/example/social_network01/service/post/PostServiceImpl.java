@@ -60,20 +60,30 @@ public class PostServiceImpl implements PostService {
         return mapToDTO(post);
     }
 
+
     @Override
     @Transactional
-    public PostDTO updatePost(PostDTO postDTO, List<MultipartFile> files) {
+    public PostDTO updatePost(PostDTO postDTO, List<MultipartFile> files, Boolean isMediaUpdated) {
         Post post = postRepository.findById(postDTO.getId())
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
-        if (post.getMedia() != null && !post.getMedia().isEmpty()) {
-            mediaService.deleteMedia(post.getMedia());
-        }
+        if(isMediaUpdated) {
+            // Получаем существующую коллекцию медиа
+            List<Media> existingMedia = post.getMedia();
 
-        List<Media> mediaList = (files != null && !files.isEmpty())
-                ? mediaService.saveMediaFiles(files, post)
-                : Collections.emptyList();
-        post.setMedia(mediaList);
+            // Удаляем связанные файлы (если нужно)
+            if (!existingMedia.isEmpty()) {
+                mediaService.deleteMedia(existingMedia); // Удаление файлов из хранилища
+                existingMedia.clear(); // Очистка коллекции активирует orphanRemoval
+            }
+
+            // Добавляем новые медиа
+            if (files != null && !files.isEmpty()) {
+
+                List<Media> newMedia = mediaService.saveMediaFiles(files, post);
+                existingMedia.addAll(newMedia); // Используем существующую коллекцию
+            }
+        }
 
         post.setText(postDTO.getText());
         postRepository.save(post);
@@ -81,10 +91,6 @@ public class PostServiceImpl implements PostService {
         return mapToDTO(post);
     }
 
-    @Override
-    public PostDTO updatePost(PostDTO postDTO) {
-        return null;
-    }
 
     @Override
     public List<PostResponseDTO> getAllPosts() {

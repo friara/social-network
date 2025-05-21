@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class MediaService {
                 });
     }
 
+    @Transactional
     public List<Media> saveMediaFiles(List<MultipartFile> files, Post post) {
         Path storagePath = Paths.get(mediaStorageLocation).toAbsolutePath().normalize();
 
@@ -125,6 +127,7 @@ public class MediaService {
         return resource;
     }
 
+    @Transactional
     public void deleteMedia(List<Media> mediaList) {
         mediaList.forEach(media -> {
             try {
@@ -134,7 +137,10 @@ public class MediaService {
                 throw new StorageException("Failed to delete file: " + media.getFileName(), e);
             }
         });
-        mediaRepository.deleteAll(mediaList); // Удаление записей из БД
+        List<Media> managedMedia = mediaList.stream()
+                .map(media -> mediaRepository.findById(media.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        mediaRepository.deleteAll(managedMedia);
     }
 }
 
