@@ -14,8 +14,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByLogin(String login);
 
     @Query("SELECT u FROM User u WHERE " +
-            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "(LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-            "LOWER(u.patronymic) LIKE LOWER(CONCAT('%', :query, '%'))")
+            "LOWER(u.patronymic) LIKE LOWER(CONCAT('%', :query, '%'))) " +
+            "AND u.isDeleted = false")
     Page<User> findByFIOContaining(@Param("query") String query, Pageable pageable);
 }

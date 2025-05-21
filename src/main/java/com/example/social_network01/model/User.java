@@ -2,6 +2,7 @@ package com.example.social_network01.model;
 
 
 import com.example.social_network01.model.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -85,8 +86,12 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserDevice> devices;
+
+    @JsonIgnore
+    @ToString.Exclude
+    private Boolean isDeleted = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -122,6 +127,7 @@ public class User implements UserDetails {
         return true;
     }
 
+    public boolean isDeleted() {return isDeleted;}
 
 }
 

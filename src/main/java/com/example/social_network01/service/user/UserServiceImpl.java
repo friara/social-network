@@ -55,6 +55,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
+                .filter(user -> !user.isDeleted())
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
     }
@@ -62,6 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserExtendedDTO> getAllUsersWithPassword() {
         return userRepository.findAll().stream()
+                .filter(user -> !user.isDeleted())
                 .map(user -> modelMapper.map(user, UserExtendedDTO.class))
                 .collect(Collectors.toList());
     }
@@ -69,6 +71,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserExtendedDTO getUserWithPasswordById(Long id) {
         return userRepository.findById(id)
+                .filter(user -> !user.isDeleted())
                 .map(user -> modelMapper.map(user, UserExtendedDTO.class))
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
@@ -76,6 +79,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserById(Long id) {
         return userRepository.findById(id)
+                .filter(user -> !user.isDeleted())
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
@@ -83,6 +87,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserByLogin(String login) {
         return userRepository.findByLogin(login)
+                .filter(user -> !user.isDeleted())
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .orElseThrow(() -> new UserNotFoundException("User not found with login: " + login));
     }
@@ -96,6 +101,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
+                .filter(u -> !u.isDeleted())
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         modelMapper.map(userDTO, user);
         return modelMapper.map(userRepository.save(user), UserDTO.class);
@@ -104,6 +110,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO adminUpdateUser(Long id, UserExtendedDTO userDTO) {
         User user = userRepository.findById(id)
+                .filter(u -> !u.isDeleted())
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
         // Обновление роли
@@ -131,13 +138,19 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .filter(u -> !u.isDeleted())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        user.setIsDeleted(true);
+        userRepository.save(user);
+//        userRepository.deleteById(id);
     }
 
     @Override
     public UserDTO uploadAvatar(Long id, MultipartFile file) {
         String imagePath = avatarService.saveImage(file);
         User user = userRepository.findById(id)
+                .filter(u -> !u.isDeleted())
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         Path path = Paths.get(imagePath);
         String fileName = path.getFileName().toString();
