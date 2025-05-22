@@ -59,7 +59,7 @@ public class MessageServiceImpl implements MessageService {
         message.setUser(user);
         message.setText(request.getText());
         message.setStatus(Message.MessageStatus.SENT);
-        message.setCreatedWhen(LocalDateTime.now());
+        //message.setCreatedWhen(LocalDateTime.now());
 
         Message savedMessage = messageRepository.save(message);
 

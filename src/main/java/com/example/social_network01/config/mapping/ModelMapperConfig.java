@@ -103,6 +103,7 @@ public class ModelMapperConfig {
                                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
                     }).map(UserExtendedDTO::getRoleName, User::setRole);
                 });
+
         Converter<Collection, Integer> collectionToSize = c -> (c.getSource() != null) ? c.getSource().size() : 0;
         // Маппинг для Post -> PostResponseDTO
         modelMapper.typeMap(Post.class, PostResponseDTO.class)
@@ -110,7 +111,6 @@ public class ModelMapperConfig {
                     mapper.map(src -> src.getUser().getId(), PostResponseDTO::setUserId);
                     mapper.using(collectionToSize).map(Post::getLikes, PostResponseDTO::setLikeCount);
                     mapper.using(collectionToSize).map(Post::getComments, PostResponseDTO::setCommentCount);
-                    mapper.using(collectionToSize).map(Post::getReposts, PostResponseDTO::setRepostCount);
                     mapper.skip(PostResponseDTO::setLiked);
                     // Маппинг коллекции Media → MediaDTO
                     mapper.using(ctx ->

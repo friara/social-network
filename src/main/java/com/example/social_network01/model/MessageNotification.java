@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Schema(hidden = true)
@@ -29,8 +31,9 @@ public class MessageNotification {
 
     private boolean isRead;
 
-    @CreatedDate
-    private LocalDateTime timestamp;
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private Instant timestamp;
 
     // Ссылка на связанное сообщение
     @ManyToOne(fetch = FetchType.LAZY)

@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class PostDTO {
             type = "string",
             format = "date-time"
     )
-    private LocalDateTime createdWhen;
+    private Instant createdWhen;
 
 
     @Schema(

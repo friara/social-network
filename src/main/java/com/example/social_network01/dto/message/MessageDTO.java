@@ -5,13 +5,15 @@ import com.example.social_network01.dto.MediaDTO;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 public class MessageDTO {
     private Long id;
-    private LocalDateTime createdWhen;
+    private Instant createdWhen;
     private String text;
     private String status;
     private Long chatId;

@@ -3,6 +3,7 @@ package com.example.social_network01.dto;
 import com.example.social_network01.dto.message.MessageDTO;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,7 +19,7 @@ public class MessageNotificationDTO {
 
     private boolean isRead;
 
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     private MessageDTO linkedMessage;
 

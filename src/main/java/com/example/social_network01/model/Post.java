@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class Post {
 
     @PastOrPresent
     @Column(nullable = false)
-    private LocalDateTime createdWhen;
+    private Instant createdWhen;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -44,17 +45,13 @@ public class Post {
     private List<Like> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @ToString.Exclude
-    private List<Repost> reposts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonManagedReference
     private List<Media> media = new ArrayList<>();
 
     @Transient
     @JsonIgnore
     public int getPopularityScore() {
-        return likes.size() + reposts.size() + comments.size();
+        return likes.size() + comments.size();
     }
 }
 

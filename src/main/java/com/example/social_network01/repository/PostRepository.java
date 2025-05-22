@@ -22,7 +22,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN FETCH p.user " +
             "LEFT JOIN FETCH p.likes " +
             "LEFT JOIN FETCH p.comments " +
-            "LEFT JOIN FETCH p.reposts " +
             "LEFT JOIN FETCH p.media")
     List<Post> findAllWithAssociations();
 
@@ -30,7 +29,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN FETCH p.user " +
             "LEFT JOIN FETCH p.likes " +
             "LEFT JOIN FETCH p.comments " +
-            "LEFT JOIN FETCH p.reposts " +
             "LEFT JOIN FETCH p.media " +
             "WHERE p.id = :id")
     Optional<Post> findByIdWithAssociations(Long id);
@@ -39,7 +37,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByOrderByCreatedWhenDesc(Pageable pageable);
 
     // Сортировка по популярности + пагинация
-    @Query("SELECT p FROM Post p LEFT JOIN p.likes l LEFT JOIN p.reposts r LEFT JOIN p.comments c " +
-            "GROUP BY p.id ORDER BY (COUNT(DISTINCT l) + COUNT(DISTINCT r) + COUNT(DISTINCT c)) DESC")
+    @Query("SELECT p FROM Post p LEFT JOIN p.likes l LEFT JOIN p.comments c " +
+            "GROUP BY p.id ORDER BY (COUNT(DISTINCT l) + COUNT(DISTINCT c)) DESC")
     Page<Post> findAllOrderByPopularityDesc(Pageable pageable);
 }

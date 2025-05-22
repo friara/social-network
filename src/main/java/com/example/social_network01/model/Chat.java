@@ -3,6 +3,8 @@ package com.example.social_network01.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,8 @@ public class Chat {
     @Column(nullable = false)
     private String chatName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdWhen;
 
     @ManyToOne(fetch = FetchType.LAZY)

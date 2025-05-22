@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +49,7 @@ public class PostServiceImpl implements PostService {
     public PostDTO createPost(String text, List<MultipartFile> files, User user) {
         Post post = new Post();
         post.setText(text);
-        post.setCreatedWhen(LocalDateTime.now());
+        post.setCreatedWhen(Instant.now());
         post.setUser(user);
         post = postRepository.save(post);
 

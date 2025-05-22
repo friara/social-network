@@ -57,7 +57,7 @@ public class ChatServiceImpl implements ChatService {
 
         Chat chat = modelMapper.map(chatDTO, Chat.class);
         chat.setCreatedBy(creator);
-        chat.setCreatedWhen(LocalDateTime.now());
+        //chat.setCreatedWhen(LocalDateTime.now());
 
         addParticipants(chat, chatDTO.getParticipantIds());
         addCreatorAsMember(chat, creator);

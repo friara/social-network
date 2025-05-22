@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +33,9 @@ public class Message {
     @Lob
     private String text;
 
-    @PastOrPresent
-    private LocalDateTime createdWhen;
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private Instant createdWhen;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)

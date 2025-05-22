@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Schema(hidden = true)
@@ -22,7 +24,8 @@ public class Comment {
     private Post post;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdWhen = LocalDateTime.now();
+    @CreationTimestamp
+    private Instant createdWhen;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
