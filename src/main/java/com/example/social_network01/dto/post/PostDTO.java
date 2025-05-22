@@ -34,11 +34,6 @@ public class PostDTO {
     )
     private String text;
 
-//    @Schema(
-//            description = "Список медиа-вложений",
-//            type = "array", // Явно указываем тип как массив
-//            implementation = MediaDTO.class // Тип элементов массива
-//    )
     @ArraySchema(schema = @Schema(implementation = MediaDTO.class))
     private List<MediaDTO> media;
 
