@@ -6,6 +6,7 @@ import com.example.social_network01.dto.message.MessageDTO;
 import com.example.social_network01.dto.post.PostResponseDTO;
 import com.example.social_network01.exception.custom.ResourceNotFoundException;
 import com.example.social_network01.model.*;
+import com.example.social_network01.repository.CommentRepository;
 import com.example.social_network01.repository.RoleRepository;
 import com.example.social_network01.repository.UserRepository;
 import org.modelmapper.Converter;
@@ -29,7 +30,11 @@ public class ModelMapperConfig {
 
 
     @Bean
-    public ModelMapper modelMapper(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public ModelMapper modelMapper(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            CommentRepository commentRepository,
+            PasswordEncoder passwordEncoder) {
         ModelMapper modelMapper = new ModelMapper();
 
         // Маппинг для Media -> MediaDTO
@@ -178,16 +183,37 @@ public class ModelMapperConfig {
         modelMapper.typeMap(Booking.class, BookingDTO.class)
                 .addMappings(mapper -> {
                     mapper.map(src -> src.getWorkspace().getId(), BookingDTO::setWorkspaceId);
-//                    mapper.using(ctx -> {
-//                        Booking booking = (Booking) ctx.getSource();
-//                        User user = booking.getUser();
-//                        if (user == null) return null;
-//                        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-//                        userDTO.setAvatarUrl(convertToUrl(user.getAvatarPath(), "avatars"));
-//                        return userDTO;
-//                    }).map(Booking::getUser, BookingDTO::setUser);
                     mapper.map(src -> src.getUser().getId(), BookingDTO::setUserId);
                 });
+
+        // Маппинг Comment -> CommentDTO
+        modelMapper.typeMap(Comment.class, CommentDTO.class)
+                .addMappings(mapper -> {
+                    mapper.map(src -> src.getPost().getId(), CommentDTO::setPostId);
+                    mapper.map(src -> src.getUser().getId(), CommentDTO::setUserId);
+                    mapper.using(ctx -> {
+                        Comment parent = (Comment) ctx.getSource(); // Получаем сам answerToComm
+                        return parent != null ? parent.getId() : null;
+                    }).map(Comment::getAnswerToComm, CommentDTO::setAnswerToComm);
+                });
+
+        // Маппинг CommentDTO -> Comment
+        modelMapper.typeMap(CommentDTO.class, Comment.class)
+                .addMappings(mapper -> {
+                    mapper.skip(Comment::setPost);
+                    mapper.skip(Comment::setUser);
+                    mapper.skip(Comment::setAnswerToComm);
+
+                    // Кастомный маппинг для answerToComm
+                    mapper.using(ctx -> {
+                        Long parentId = (Long) ctx.getSource();
+                        return parentId != null ?
+                                commentRepository.findById(parentId)
+                                        .orElseThrow(() -> new ResourceNotFoundException("Parent comment not found"))
+                                : null;
+                    }).map(CommentDTO::getAnswerToComm, Comment::setAnswerToComm);
+                });
+
 
         //modelMapper.validate();
         modelMapper.getConfiguration().setAmbiguityIgnored(true);

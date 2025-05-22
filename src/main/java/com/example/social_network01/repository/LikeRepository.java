@@ -13,6 +13,6 @@ public interface LikeRepository extends JpaRepository<Like, LikeId> {
 
     List<Like> findByPostId(Long postId);
     Page<Like> findByPostId(Long postId, Pageable pageable);
-    boolean deleteByPostIdAndUserId(Long postId, Long userId);
+    int deleteByPostIdAndUserId(Long postId, Long userId);
     Long countByPostId(Long postId);
 }

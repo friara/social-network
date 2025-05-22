@@ -25,7 +25,8 @@ public class CommentController {
             @PathVariable Long postId,
             @RequestBody @Valid CommentDTO request,
             @AuthenticationPrincipal User currentUser) {
-
+        request.setPostId(postId);
+        request.setUserId(currentUser.getId());
         CommentDTO response = commentService.createComment(postId, request, currentUser);
 
         URI location = ServletUriComponentsBuilder

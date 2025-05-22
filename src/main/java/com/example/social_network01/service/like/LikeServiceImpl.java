@@ -60,14 +60,16 @@ public class LikeServiceImpl implements LikeService {
                 .map(like -> modelMapper.map(like, LikeDTO.class));
     }
 
-    // Методы deleteLike и getLikesCount остаются без изменений
     @Override
     @Transactional
     public void deleteLike(Long postId, Long userId) {
-        if (!likeRepository.existsByPostIdAndUserId(postId, userId)) {
-            throw new LikeNotFoundException("Like not found");
+//        if (!likeRepository.existsByPostIdAndUserId(postId, userId)) {
+//            throw new LikeNotFoundException("Like not found");
+//        }
+//        likeRepository.deleteByPostIdAndUserId(postId, userId);
+        if (likeRepository.existsByPostIdAndUserId(postId, userId)) {
+            likeRepository.deleteByPostIdAndUserId(postId, userId);
         }
-        likeRepository.deleteByPostIdAndUserId(postId, userId);
     }
 
     @Override
@@ -77,35 +79,4 @@ public class LikeServiceImpl implements LikeService {
     }
 }
 
-//    @Autowired
-//    private LikeRepository likeRepository;
-//
-//    @Autowired
-//    private ModelMapper modelMapper;
-//
-//    @Override
-//    public LikeDTO createLike(LikeDTO likeDTO) {
-//        Like like = modelMapper.map(likeDTO, Like.class);
-//        return modelMapper.map(likeRepository.save(like), LikeDTO.class);
-//    }
-//
-//    @Override
-//    public List<LikeDTO> getAllLikes() {
-//        return likeRepository.findAll().stream()
-//                .map(like -> modelMapper.map(like, LikeDTO.class))
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public LikeDTO getLikeById(Long id) {
-//        return likeRepository.findById(id)
-//                .map(like -> modelMapper.map(like, LikeDTO.class))
-//                .orElse(null);
-//    }
-//
-//    @Override
-//    public void deleteLike(Long id) {
-//        likeRepository.deleteById(id);
-//    }
-//}
 

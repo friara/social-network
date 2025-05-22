@@ -41,17 +41,13 @@ public class LikeController {
         return likeService.getLikesByPost(postId, pageable);
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(
             @PathVariable Long postId,
-            @PathVariable Long userId,
             @AuthenticationPrincipal User currentUser
     ) {
-        if (!userId.equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can only delete your own likes");
-        }
-        likeService.deleteLike(postId, userId);
+        likeService.deleteLike(postId, currentUser.getId());
     }
 
     @GetMapping("/count")

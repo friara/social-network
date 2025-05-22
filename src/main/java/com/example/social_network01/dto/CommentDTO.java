@@ -10,6 +10,6 @@ public class CommentDTO {
     private Long postId;
     private Long userId;
     private String text;
-    private String answerToComm;
+    private Long answerToComm;
 }
 

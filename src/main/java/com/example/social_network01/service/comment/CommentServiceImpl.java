@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ public class CommentServiceImpl implements CommentService {
     private ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public CommentDTO createComment(Long postId, CommentDTO request, User currentUser) {
         // Находим пост
         Post post = postRepository.findById(postId)
@@ -43,16 +45,16 @@ public class CommentServiceImpl implements CommentService {
         comment.setText(request.getText());
         comment.setPost(post);
         comment.setUser(currentUser);
+        if(request.getAnswerToComm() != null) {
+            Comment answerToComment = commentRepository.findById(request.getAnswerToComm())
+                    .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + request.getAnswerToComm()));
+            comment.setAnswerToComm(answerToComment);
+        }
 
         // Сохраняем и возвращаем DTO
         return modelMapper.map(commentRepository.save(comment), CommentDTO.class);
     }
 
-    @Override
-    public CommentDTO createComment(CommentDTO commentDTO) {
-        Comment comment = modelMapper.map(commentDTO, Comment.class);
-        return modelMapper.map(commentRepository.save(comment), CommentDTO.class);
-    }
 
     @Override
     public List<CommentDTO> getAllComments() {
@@ -69,6 +71,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void deleteComment(Long id) {
         commentRepository.deleteById(id);
     }
@@ -85,6 +88,7 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.countByPostId(postId);
     }
     @Override
+    @Transactional
     public CommentDTO updateComment(Long commentId, CommentDTO commentDTO, User currentUser) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
@@ -98,6 +102,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void deleteComment(Long commentId, User currentUser) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
