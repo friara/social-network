@@ -127,6 +127,7 @@ public class ModelMapperConfig {
                     mapper.map(src -> src.getMessage().getId(), FileDTO::setMessageId);
                     mapper.using(ctx -> convertToUrl((String) ctx.getSource(), "files"))
                             .map(File::getFileName, FileDTO::setFileUrl);
+                    mapper.map(File::getOriginalFileName, FileDTO::setFileName);
                 });
 
         // Маппинг для Message

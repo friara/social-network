@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,14 +46,18 @@ public class File {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, unique = true, length = 255)
     private String fileName;
+
+    @NotBlank
+    @Column(nullable = false, length = 255)
+    private String originalFileName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private FileType fileType;
 
-    @Column(nullable = false, length = 100)
+    //@Column(nullable = false, length = 100)
     private String mimeType;
 
     @Column(nullable = false)
@@ -67,10 +72,6 @@ public class File {
     @JoinColumn(name = "uploaded_by", nullable = false)
     @JsonBackReference
     private User user;
-
-//    @OneToMany(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonBackReference
-//    private List<MessageFile> messageFiles = new ArrayList<>();
 
     // Связь многие-к-одному с Message
     @ManyToOne(fetch = FetchType.LAZY)

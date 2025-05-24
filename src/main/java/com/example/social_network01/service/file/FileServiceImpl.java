@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.apache.tika.Tika;
 
 @Service
 public class FileServiceImpl implements FileService{
@@ -39,17 +40,18 @@ public class FileServiceImpl implements FileService{
         this.modelMapper = modelMapper;
     }
 
-    private void initModelMapperMappings() {
-        modelMapper.typeMap(MultipartFile.class, File.class)
-                .addMappings(mapper -> {
-                    mapper.skip(File::setId);
-                    mapper.skip(File::setUploadedWhen);
-                    mapper.map(src -> src.getOriginalFilename(), File::setFileName);
-                    mapper.map(src -> src.getSize(), File::setFileSize);
-                    mapper.map(src -> src.getContentType(), File::setMimeType);
-                });
-    }
+//    private void initModelMapperMappings() {
+//        modelMapper.typeMap(MultipartFile.class, File.class)
+//                .addMappings(mapper -> {
+//                    mapper.skip(File::setId);
+//                    mapper.skip(File::setUploadedWhen);
+//                    mapper.map(src -> src.getOriginalFilename(), File::setFileName);
+//                    mapper.map(src -> src.getSize(), File::setFileSize);
+//                    mapper.map(src -> src.getContentType(), File::setMimeType);
+//                });
+//    }
 
+    @Transactional(readOnly = true)
     @Override
     public List<FileDTO> getAllFiles() {
         return fileRepository.findAll().stream()
@@ -57,6 +59,7 @@ public class FileServiceImpl implements FileService{
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public FileDTO getFileById(Long id) {
         return fileRepository.findById(id)
@@ -64,6 +67,12 @@ public class FileServiceImpl implements FileService{
                 .orElseThrow(() -> new StorageException("File not found with id: " + id));
     }
 
+    public String generateUniqueFilename(String originalName) {
+        String uuid = UUID.randomUUID().toString();
+        return uuid + "_" + (originalName != null ? originalName : "file");
+    }
+
+    @Transactional
     @Override
     public List<FileDTO> saveFiles(List<MultipartFile> files, Message message) {
         if (files == null || files.isEmpty()) {
@@ -85,9 +94,14 @@ public class FileServiceImpl implements FileService{
                         Path targetLocation = storagePath.resolve(filename);
                         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-                        File fileEntity = modelMapper.map(file, File.class);
+                        File fileEntity = new File();
+                        fileEntity.setFileName(filename);
+                        fileEntity.setOriginalFileName(file.getOriginalFilename());
+                        fileEntity.setFileSize(file.getSize());
+                        fileEntity.setMimeType(detectFileType(file));
                         fileEntity.setMessage(message);
-                        fileEntity.setFileType(File.FileType.fromMimeType(file.getContentType()));
+                        fileEntity.setFileType(File.FileType.fromMimeType(fileEntity.getMimeType()));
+                        fileEntity.setUser(message.getUser());
 
                         validateFile(fileEntity, file);
 
@@ -112,6 +126,8 @@ public class FileServiceImpl implements FileService{
         }
 
         Set<String> allowedTypes = Set.of(
+                "application/x-tika-ooxml",
+                "application/x-tika-msoffice",
                 "application/pdf", "application/msword",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -121,11 +137,22 @@ public class FileServiceImpl implements FileService{
                 "image/jpeg", "image/png", "image/gif"
         );
 
-        if (!allowedTypes.contains(file.getMimeType())) {
+        // Разрешаем все типы документов от Tika
+        boolean isAllowed = allowedTypes.contains(file.getMimeType())
+                || file.getMimeType().startsWith("application/x-tika-");
+
+        if (!isAllowed) {
             throw new InvalidFileTypeException("Unsupported file type: " + file.getMimeType());
         }
     }
 
+    public String detectFileType(MultipartFile file) throws IOException {
+        Tika tika = new Tika();
+        tika.setMaxStringLength(-1); // Для больших файлов
+        return tika.detect(file.getInputStream());
+    }
+
+    @Transactional
     @Override
     public Resource loadFile(String filename) throws IOException {
         Path file = Paths.get(fileStorageLocation).resolve(filename).toAbsolutePath().normalize();
@@ -138,6 +165,7 @@ public class FileServiceImpl implements FileService{
         }
     }
 
+    @Transactional
     @Override
     public void deleteFiles(List<File> files) {
         files.forEach(file -> {
@@ -161,21 +189,32 @@ public class FileServiceImpl implements FileService{
     @Override
     @Transactional
     public List<FileDTO> updateFiles(List<MultipartFile> newFiles, Message message) {
-        // Удаление только если есть новые файлы
+        // Удаляем старые файлы всегда
+        List<File> oldFiles = fileRepository.findByMessageId(message.getId());
+        deleteFiles(oldFiles);
+
         if (newFiles != null && !newFiles.isEmpty()) {
-            fileRepository.deleteByMessageId(message.getId());
-            Path storagePath = Paths.get(fileStorageLocation);
-
-            // Удаление физических файлов
-            fileRepository.findByMessageId(message.getId()).forEach(file -> {
-                try {
-                    Files.deleteIfExists(storagePath.resolve(file.getFileName()));
-                } catch (IOException e) {
-                    throw new StorageException("File delete error: " + file.getFileName(), e);
-                }
-            });
+            return saveFiles(newFiles, message);
         }
-
-        return saveFiles(newFiles, message);
+        return Collections.emptyList();
     }
+//    @Transactional
+//    public List<FileDTO> updateFiles(List<MultipartFile> newFiles, Message message) {
+//        // Удаление только если есть новые файлы
+//        if (newFiles != null && !newFiles.isEmpty()) {
+//            fileRepository.deleteByMessageId(message.getId());
+//            Path storagePath = Paths.get(fileStorageLocation);
+//
+//            // Удаление физических файлов
+//            fileRepository.findByMessageId(message.getId()).forEach(file -> {
+//                try {
+//                    Files.deleteIfExists(storagePath.resolve(file.getFileName()));
+//                } catch (IOException e) {
+//                    throw new StorageException("File delete error: " + file.getFileName(), e);
+//                }
+//            });
+//        }
+//
+//        return saveFiles(newFiles, message);
+//    }
 }

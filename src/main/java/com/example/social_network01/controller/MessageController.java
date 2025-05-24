@@ -4,6 +4,8 @@ import com.example.social_network01.dto.message.MessageDTO;
 import com.example.social_network01.dto.message.MessageRequestDTO;
 import com.example.social_network01.model.User;
 import com.example.social_network01.service.message.MessageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +46,44 @@ public class MessageController {
 
         return ResponseEntity.ok(messageService.getMessagesByChatId(chatId, pageable));
     }
+
+
+//    @Operation(summary = "Create message with files",
+//            description = "Create a new message in chat with optional file attachments")
+//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
+//    public ResponseEntity<MessageDTO> createMessage(
+//            @Parameter(description = "ID чата", required = true)
+//            @PathVariable Long chatId,
+//
+//            @Parameter(description = "Message data and files",
+//                    content = @Content(
+//                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+//                            schema = @Schema(implementation = MessageRequestDTO.class),
+//                            encoding = {
+//                                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE),
+//                                    @Encoding(name = "files", contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+//                            }
+//                    ))
+//            @Valid @RequestPart("request") MessageRequestDTO request,
+//
+//            @Parameter(description = "List of files to attach")
+//            @RequestPart(value = "files", required = false) List<MultipartFile> files,
+//
+//            @AuthenticationPrincipal User currentUser) {
+//
+//        // Привязываем файлы к DTO если они есть
+//        if (files != null && !files.isEmpty()) {
+//            request.setFiles(files);
+//        }
+//
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(messageService.createMessage(
+//                        chatId,
+//                        currentUser.getId(),
+//                        request
+//                ));
+//    }
 
     @PostMapping
     @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
