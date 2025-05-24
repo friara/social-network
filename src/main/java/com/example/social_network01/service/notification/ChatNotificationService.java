@@ -62,6 +62,7 @@ public class ChatNotificationService {
             notification.setRead(false);
             notification.setTimestamp(message.getCreatedWhen());
             notification.setChatName(message.getChat().getChatName());
+            notification.setChatId(message.getChat().getId());
             String content = message.getText();
             if (content.isEmpty() && !message.getFiles().isEmpty()) {
                 content = message.getFiles().get(0).getFileName();

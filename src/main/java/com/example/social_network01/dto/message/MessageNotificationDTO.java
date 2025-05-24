@@ -28,5 +28,7 @@ public class MessageNotificationDTO {
 
     @Schema(description = "Chat's name of message")
     private String chatName;
+
+    private Long chatId;
 }
 
