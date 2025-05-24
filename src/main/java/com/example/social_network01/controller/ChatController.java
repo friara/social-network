@@ -36,8 +36,9 @@ public class ChatController {
     @PreAuthorize("@chatService.isChatCreator(#id, #currentUser.id)")
     public ResponseEntity<ChatDTO> updateChat(
             @PathVariable Long id,
-            @RequestBody @Valid ChatDTO chatDTO) {
-        ChatDTO updatedChat = chatService.updateChat(id, chatDTO);
+            @RequestBody @Valid ChatDTO chatDTO,
+            @AuthenticationPrincipal User currentUser) {
+        ChatDTO updatedChat = chatService.updateChat(id, chatDTO, currentUser);
         return ResponseEntity.ok(updatedChat);
     }
 
@@ -57,12 +58,12 @@ public class ChatController {
     public ResponseEntity<ChatDTO> getChatById(
             @PathVariable Long id,
             @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(chatService.getChatById(id));
+        return ResponseEntity.ok(chatService.getChatById(id, currentUser));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@chatService.isChatCreator(#id, #currentUser.id) or hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteChat(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteChat(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
         chatService.deleteChat(id);
         return ResponseEntity.noContent().build();
     }

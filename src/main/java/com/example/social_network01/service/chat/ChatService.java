@@ -18,11 +18,11 @@ public interface ChatService {
 
     List<ChatDTO> getAllChats();
 
-    ChatDTO getChatById(Long id);
+    ChatDTO getChatById(Long id, User user);
 
     void deleteChat(Long id);
 
-    ChatDTO updateChat(Long id, ChatDTO chatDTO);
+    ChatDTO updateChat(Long id, ChatDTO chatDTO, User user);
 
     boolean isChatCreator(Long chatId, Long userId);
 

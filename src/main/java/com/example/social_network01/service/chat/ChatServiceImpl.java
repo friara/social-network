@@ -62,25 +62,33 @@ public class ChatServiceImpl implements ChatService {
         addParticipants(chat, chatDTO.getParticipantIds());
         addCreatorAsMember(chat, creator);
 
-        return convertToDTO(chatRepository.save(chat));
+        if (chat.getChatType() == Chat.ChatType.PRIVATE)
+        {
+            User otherUser = userRepository.findById(chatDTO.getParticipantIds().get(0))
+                    .orElseThrow(() -> new UserNotFoundException("User for chat not found"));
+            chat.setChatName(creator.getUsername() + '|' + otherUser.getUsername());
+        }
+
+
+        return convertToDTO(chatRepository.save(chat), creator.getId());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ChatDTO getChatById(Long id) {
+    public ChatDTO getChatById(Long id, User user) {
         return chatRepository.findById(id)
-                .map(this::convertToDTO)
+                .map(chat -> convertToDTO(chat, user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Chat not found"));
     }
 
     @Override
     @Transactional
-    public ChatDTO updateChat(Long id, ChatDTO chatDTO) {
+    public ChatDTO updateChat(Long id, ChatDTO chatDTO, User creator) {
         Chat chat = chatRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Chat not found"));
 
         modelMapper.map(chatDTO, chat);
-        return convertToDTO(chatRepository.save(chat));
+        return convertToDTO(chatRepository.save(chat), creator.getId());
     }
 
     @Override
@@ -118,11 +126,34 @@ public class ChatServiceImpl implements ChatService {
         // Считаем непрочитанные сообщения
         dto.setUnreadCount(messageRepository.countUnreadMessages(chat.getId(), userId));
 
+        // Определяем отображаемое имя чата
+        if (chat.getChatType() == Chat.ChatType.PRIVATE) {
+            String otherUserFio = chat.getChatMembers().stream()
+                    .map(ChatMember::getUser)
+                    .filter(user -> !user.getId().equals(userId))
+                    .findFirst()
+                    .map(user -> user.getFirstName() + " " + user.getLastName())
+                    .orElse("Unknown User");
+            dto.setChatName(otherUserFio);
+        }
+
         return dto;
     }
 
-    private ChatDTO convertToDTO(Chat chat) {
+    private ChatDTO convertToDTO(Chat chat, Long userId) {
         ChatDTO dto = modelMapper.map(chat, ChatDTO.class);
+
+        // Добавляем логику для названия приватного чата
+        if (chat.getChatType() == Chat.ChatType.PRIVATE) {
+            String otherUserFio = chat.getChatMembers().stream()
+                    .map(ChatMember::getUser)
+                    .filter(user -> !user.getId().equals(userId))
+                    .findFirst()
+                    .map(user -> user.getFirstName() + " " + user.getLastName())
+                    .orElse("Unknown User");
+            dto.setChatName(otherUserFio);
+        }
+
         dto.setParticipantIds(getParticipantIds(chat));
         return dto;
     }
