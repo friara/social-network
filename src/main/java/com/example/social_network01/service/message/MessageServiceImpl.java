@@ -13,6 +13,7 @@ import com.example.social_network01.repository.ChatRepository;
 import com.example.social_network01.repository.MessageRepository;
 import com.example.social_network01.repository.UserRepository;
 import com.example.social_network01.service.file.FileService;
+import com.example.social_network01.service.notification.ChatNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,7 +34,8 @@ public class MessageServiceImpl implements MessageService {
     private final UserRepository userRepository;
     private final FileService fileService;
     private final ModelMapper modelMapper;
-    private final ApplicationEventPublisher eventPublisher;
+    //private final ApplicationEventPublisher eventPublisher;
+    private final ChatNotificationService chatNotificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -68,7 +70,9 @@ public class MessageServiceImpl implements MessageService {
             fileService.saveFiles(request.getFiles(), savedMessage);
         }
 
-        eventPublisher.publishEvent(new NewMessageEvent(this, message, user.getId()));
+        //eventPublisher.publishEvent(new NewMessageEvent(this, message, user.getId()));
+        chatNotificationService.notifyChatMembers(savedMessage);
+
         return modelMapper.map(savedMessage, MessageDTO.class);
     }
 

@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface ChatMemberRepository extends JpaRepository<ChatMember, Long> {
     List<ChatMember> findByChatId(Long chatId);
+    Boolean existsByChatIdAndUserId(Long chatId, Long userId);
 }
 

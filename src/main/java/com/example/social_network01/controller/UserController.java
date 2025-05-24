@@ -133,24 +133,24 @@ public class UserController {
     }
 
 
-    @PostMapping("/fcm-token")
-    public ResponseEntity<?> saveFcmToken(
-            @AuthenticationPrincipal User user,
-            @RequestBody Map<String, String> request
-    ) {
-        String fcmToken = request.get("fcmToken");
-        String deviceId = request.get("deviceId"); // Клиент должен генерировать уникальный ID
-
-        if (fcmToken == null || deviceId == null) {
-            return ResponseEntity.badRequest().body("FCM token and device ID are required");
-        }
-
-        try {
-            userDeviceService.saveOrUpdateDevice(user, fcmToken, deviceId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error saving device");
-        }
-    }
+//    @PostMapping("/fcm-token")
+//    public ResponseEntity<?> saveFcmToken(
+//            @AuthenticationPrincipal User user,
+//            @RequestBody Map<String, String> request
+//    ) {
+//        String fcmToken = request.get("fcmToken");
+//        String deviceId = request.get("deviceId"); // Клиент должен генерировать уникальный ID
+//
+//        if (fcmToken == null || deviceId == null) {
+//            return ResponseEntity.badRequest().body("FCM token and device ID are required");
+//        }
+//
+//        try {
+//            userDeviceService.saveOrUpdateDevice(user, fcmToken, deviceId);
+//            return ResponseEntity.ok().build();
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("Error saving device");
+//        }
+//    }
 
 }

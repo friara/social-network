@@ -37,6 +37,7 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private MediaService mediaService;
 
+    @Transactional
     @Override
     public PostDTO createPost(PostDTO postDTO) {
         Post post = modelMapper.map(postDTO, Post.class);
@@ -92,7 +93,7 @@ public class PostServiceImpl implements PostService {
         return mapToDTO(post);
     }
 
-
+    @Transactional(readOnly = true)
     @Override
     public List<PostResponseDTO> getAllPosts() {
         return postRepository.findAll().stream()
@@ -114,7 +115,7 @@ public class PostServiceImpl implements PostService {
         return postDTO;
     }
 
-
+    @Transactional(readOnly = true)
     @Override
     public PostDTO getPostById(Long id) {
         return postRepository.findById(id)
@@ -161,7 +162,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<PostResponseDTO> getPostsSortedByPopularity(Pageable pageable, User currentUser) {
         return postRepository.findAllOrderByPopularityDesc(pageable)
                 .map(post -> {

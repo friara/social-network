@@ -13,6 +13,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByLogin(String login);
 
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.role WHERE u.login = :login")
+    Optional<User> findByLoginWithRole(@Param("login") String login);
+
     @Query("SELECT u FROM User u WHERE " +
             "(LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +

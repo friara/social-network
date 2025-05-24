@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Transactional
     @Override
     public UserDTO createUser(UserExtendedDTO userDTO) {
         String password = userDTO.getPassword();
@@ -52,6 +54,7 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(savedUser, UserDTO.class);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
@@ -60,6 +63,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserExtendedDTO> getAllUsersWithPassword() {
         return userRepository.findAll().stream()
@@ -68,6 +72,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserExtendedDTO getUserWithPasswordById(Long id) {
         return userRepository.findById(id)
@@ -76,6 +81,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDTO getUserById(Long id) {
         return userRepository.findById(id)
@@ -84,6 +90,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDTO getUserByLogin(String login) {
         return userRepository.findByLogin(login)
@@ -92,12 +99,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with login: " + login));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<UserDTO> searchByFIO(String query, Pageable pageable) {
         return userRepository.findByFIOContaining(query, pageable)
                 .map(user -> modelMapper.map(user, UserDTO.class));
     }
 
+    @Transactional
     @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
@@ -107,6 +116,7 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(userRepository.save(user), UserDTO.class);
     }
 
+    @Transactional
     @Override
     public UserDTO adminUpdateUser(Long id, UserExtendedDTO userDTO) {
         User user = userRepository.findById(id)
@@ -136,6 +146,8 @@ public class UserServiceImpl implements UserService {
         dto.setRoleName(user.getRole().getName());
         return dto;
     }
+
+    @Transactional
     @Override
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
@@ -146,6 +158,7 @@ public class UserServiceImpl implements UserService {
 //        userRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public UserDTO uploadAvatar(Long id, MultipartFile file) {
         String imagePath = avatarService.saveImage(file);

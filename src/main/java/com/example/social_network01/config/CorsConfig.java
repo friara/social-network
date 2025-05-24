@@ -17,6 +17,9 @@ public class CorsConfig {
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true); // Для работы с куки/токенами
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
+                        .allowedMethods("*");
                 // Разрешаем запросы для Swagger UI
                 registry.addMapping("/swagger-ui/**")
                         .allowedOrigins("http://localhost:8080")  // URL Spring Boot-приложения

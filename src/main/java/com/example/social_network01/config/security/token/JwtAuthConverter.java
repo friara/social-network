@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import com.example.social_network01.exception.custom.UserNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
@@ -16,13 +17,14 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
         // 1. Извлеките данные из токена
         String username = jwt.getClaim("sub");
 
         // 2. Загрузите пользователя из БД
-        User user = userRepository.findByLogin(username)
+        User user = userRepository.findByLoginWithRole(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // 3. Создайте объект аутентификации
