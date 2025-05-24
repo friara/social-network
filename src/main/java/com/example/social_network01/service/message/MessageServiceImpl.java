@@ -103,15 +103,15 @@ public class MessageServiceImpl implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException("Message not found with id " + messageId));
 
-        if (!message.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("User is not message author");
-        }
-
-        message.setStatus(Message.MessageStatus.DELETED);
-        messageRepository.save(message);
+//        if (!message.getUser().getId().equals(userId)) {
+//            throw new AccessDeniedException("User is not message author");
+//        }
+//
+//        message.setStatus(Message.MessageStatus.DELETED);
+//        messageRepository.save(message);
 
         // Опционально: физическое удаление
-        // messageRepository.delete(message);
+         messageRepository.delete(message);
     }
 
     @Override
