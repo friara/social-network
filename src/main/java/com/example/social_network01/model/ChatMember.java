@@ -3,6 +3,9 @@ package com.example.social_network01.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.time.LocalDateTime;
 
 @Schema(hidden = true)
@@ -15,6 +18,7 @@ public class ChatMember {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Chat chat;
 
     @ManyToOne(fetch = FetchType.LAZY)

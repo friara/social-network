@@ -1,6 +1,7 @@
 package com.example.social_network01.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -8,6 +9,8 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -24,6 +27,7 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "chat_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Chat chat;
 
     @ManyToOne
@@ -49,5 +53,10 @@ public class Message {
     public enum MessageStatus {
         SENT, DELIVERED, READ, EDITED, DELETED
     }
+
+    @OneToMany(mappedBy = "linkedMessage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<MessageNotification> notifications = new ArrayList<>();
+
 
 }
