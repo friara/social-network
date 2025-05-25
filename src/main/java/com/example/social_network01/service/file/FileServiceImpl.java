@@ -134,7 +134,9 @@ public class FileServiceImpl implements FileService{
                 "text/csv", "application/vnd.ms-powerpoint",
                 "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                 "application/zip", "application/x-rar-compressed",
-                "image/jpeg", "image/png", "image/gif"
+                "image/jpeg", "image/png", "image/gif",
+                "video/mp4", "video/mpeg", "video/quicktime",
+                "video/x-msvideo", "video/x-matroska"
         );
 
         // Разрешаем все типы документов от Tika
@@ -198,23 +200,5 @@ public class FileServiceImpl implements FileService{
         }
         return Collections.emptyList();
     }
-//    @Transactional
-//    public List<FileDTO> updateFiles(List<MultipartFile> newFiles, Message message) {
-//        // Удаление только если есть новые файлы
-//        if (newFiles != null && !newFiles.isEmpty()) {
-//            fileRepository.deleteByMessageId(message.getId());
-//            Path storagePath = Paths.get(fileStorageLocation);
-//
-//            // Удаление физических файлов
-//            fileRepository.findByMessageId(message.getId()).forEach(file -> {
-//                try {
-//                    Files.deleteIfExists(storagePath.resolve(file.getFileName()));
-//                } catch (IOException e) {
-//                    throw new StorageException("File delete error: " + file.getFileName(), e);
-//                }
-//            });
-//        }
-//
-//        return saveFiles(newFiles, message);
-//    }
+
 }

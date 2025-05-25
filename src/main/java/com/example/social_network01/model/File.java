@@ -25,21 +25,35 @@ public class File {
         PRESENTATION,   // Презентации (PPTX)
         IMAGE,          // Изображения
         ARCHIVE,        // Архивы (ZIP, RAR)
+        VIDEO,          // Видеофайлы
         OTHER;           // Прочие типы
 
         public static FileType fromMimeType(String mimeType) {
             if (mimeType == null) return OTHER;
 
-            return switch (mimeType.split("/")[1]) {
-                case "pdf", "msword", "vnd.openxmlformats-officedocument.wordprocessingml.document" -> DOCUMENT;
-                case "vnd.ms-excel", "vnd.openxmlformats-officedocument.spreadsheetml.sheet", "csv" -> SPREADSHEET;
-                case "vnd.ms-powerpoint", "vnd.openxmlformats-officedocument.presentationml.presentation" -> PRESENTATION;
+            // Сначала проверяем общие категории
+            if (mimeType.startsWith("image/")) {
+                return IMAGE;
+            } else if (mimeType.startsWith("video/")) {  // <--- ДОБАВЛЕНА ПРОВЕРКА VIDEO
+                return VIDEO;
+            }
+
+            // Затем проверяем конкретные подтипы
+            String subtype = mimeType.split("/")[1];
+            return switch (subtype) {
+                case "pdf",
+                     "msword",
+                     "vnd.openxmlformats-officedocument.wordprocessingml.document" -> DOCUMENT;
+                case "vnd.ms-excel",
+                     "vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                     "csv" -> SPREADSHEET;
+                case "vnd.ms-powerpoint",
+                     "vnd.openxmlformats-officedocument.presentationml.presentation" -> PRESENTATION;
                 case "zip", "x-rar-compressed" -> ARCHIVE;
-                case "jpeg", "png", "gif" -> IMAGE;
                 default -> OTHER;
             };
         }
-        }
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
