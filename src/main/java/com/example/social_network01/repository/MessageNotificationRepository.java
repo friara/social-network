@@ -12,13 +12,51 @@ import java.util.List;
 
 public interface MessageNotificationRepository extends JpaRepository<MessageNotification, Long> {
     // Метод для получения уведомлений
-    List<MessageNotification> findByRecipientOrderByTimestampDesc(
+    List<MessageNotification> findByRecipientOrderByCreatedAtDesc(
             User recipient,
             Pageable pageable
     );
 
+    List<MessageNotification> findByRecipientAndStatusOrderByCreatedAtDesc(
+            User recipient,
+            Pageable pageable,
+            MessageNotification.NotificationStatus status
+    );
+
     // Метод для обновления статуса
-    @Modifying
-    @Query("UPDATE MessageNotification n SET n.isRead = :isRead WHERE n.id = :id")
-    int updateReadStatus(@Param("id") Long id, @Param("isRead") boolean isRead);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE MessageNotification n SET n.status = :status WHERE n.id = :id")
+    int updateStatus(@Param("id") Long id, @Param("status") MessageNotification.NotificationStatus status);
+
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE MessageNotification n 
+        SET n.status = :newStatus 
+        WHERE n.recipient = :user 
+        AND n.linkedMessage.chat.id = :chatId 
+        AND n.status = :oldStatus
+    """)
+    int bulkUpdateStatusInChat(
+            @Param("user") User user,
+            @Param("chatId") Long chatId,
+            @Param("oldStatus") MessageNotification.NotificationStatus oldStatus,
+            @Param("newStatus") MessageNotification.NotificationStatus newStatus
+    );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE MessageNotification n 
+        SET n.status = :newStatus 
+        WHERE n.recipient = :user 
+        AND n.status = :oldStatus
+    """)
+    int bulkUpdateAllForUser(
+            @Param("user") User user,
+            @Param("oldStatus") MessageNotification.NotificationStatus oldStatus,
+            @Param("newStatus") MessageNotification.NotificationStatus newStatus
+    );
+
+    @Query("SELECT COUNT(n) FROM MessageNotification n WHERE n.recipient = :user AND n.status = 'UNREAD'")
+    long countUnreadByRecipient(@Param("user") User user);
 }

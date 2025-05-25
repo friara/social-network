@@ -8,7 +8,7 @@ import lombok.Data;
 
 import java.time.Instant;
 
-@Schema(name = "MessageNotification", description = "Message notification details")
+@Schema(hidden = true)
 @Data
 public class MessageNotificationDTO {
     @Schema(description = "Unique identifier")
@@ -21,7 +21,7 @@ public class MessageNotificationDTO {
     private String content;
 
     @Schema(description = "Read status")
-    private boolean isRead;
+    private boolean isRead = false;
 
     @Schema(description = "Timestamp of the message")
     private Instant timestamp;

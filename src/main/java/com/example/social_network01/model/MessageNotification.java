@@ -26,18 +26,20 @@ public class MessageNotification {
     @JoinColumn(name = "user_id")
     private User sender;
 
-    @NotBlank
-    private String content;
-
-    private boolean isRead;
-
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
-    private Instant timestamp;
+    private Instant createdAt;
 
     // Ссылка на связанное сообщение
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_id")
     private Message linkedMessage;
+
+    @Enumerated(EnumType.STRING)
+    private NotificationStatus status = NotificationStatus.UNREAD;
+
+    public enum NotificationStatus {
+        READ, UNREAD
+    }
 
 }

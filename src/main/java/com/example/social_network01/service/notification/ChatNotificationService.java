@@ -61,7 +61,21 @@ public class ChatNotificationService {
             notification.setSender(message.getUser().getFirstName() + " " + message.getUser().getLastName());
             notification.setRead(false);
             notification.setTimestamp(message.getCreatedWhen());
+
+            Chat chat = message.getChat();
+
             notification.setChatName(message.getChat().getChatName());
+            // Определяем отображаемое имя чата
+            if (chat.getChatType() == Chat.ChatType.PRIVATE) {
+                String otherUserFio = chat.getChatMembers().stream()
+                        .map(ChatMember::getUser)
+                        .filter(user -> !user.getId().equals(message.getUser().getId()))
+                        .findFirst()
+                        .map(user -> user.getFirstName() + " " + user.getLastName())
+                        .orElse("Unknown User");
+                notification.setChatName(otherUserFio);
+            }
+
             notification.setChatId(message.getChat().getId());
             String content = message.getText();
             if (content.isEmpty() && !message.getFiles().isEmpty()) {

@@ -90,8 +90,8 @@ public class User implements UserDetails {
     //@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserDevice> devices;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<UserDevice> devices;
 
     @JsonIgnore
     @ToString.Exclude
