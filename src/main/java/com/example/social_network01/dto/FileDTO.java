@@ -10,6 +10,7 @@ public class FileDTO {
     private String fileName;
     private String fileUrl;
     private String fileType;
+    private Long fileSize;
     private LocalDateTime uploadedWhen;
     private Long uploadedBy;
     private Long messageId;
