@@ -1,5 +1,6 @@
 package com.example.social_network01.dto.message;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,5 +13,7 @@ public class MessageRequestDTO {
     private String text;
 
     private List<MultipartFile> files;
+
+    private boolean isFileUpload;
 }
 

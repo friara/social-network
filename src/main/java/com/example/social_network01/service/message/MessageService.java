@@ -14,7 +14,7 @@ public interface MessageService {
     Page<MessageDTO> getMessagesByChatId(Long chatId, Pageable pageable);
     MessageDTO createMessage(Long chatId, Long userId, MessageRequestDTO request);
     MessageDTO updateMessage(Long messageId, Long userId, MessageRequestDTO request);
-    void deleteMessage(Long messageId, Long userId);
+    void deleteMessage(Long chatId, Long messageId);
 
     boolean isMessageAuthor(Long messageId, Long userId);
 }
