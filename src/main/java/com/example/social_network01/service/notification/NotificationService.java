@@ -69,7 +69,7 @@ public class NotificationService {
 
         notificationOfMessageWithLinks.setId(messageNotification.getId());
         notificationOfMessageWithLinks.setContent(messageNotification.getLinkedMessage().getText());
-        if (notificationOfMessageWithLinks.getContent().isEmpty())
+        if (notificationOfMessageWithLinks.getContent() == null)
             notificationOfMessageWithLinks.setContent("Новое сообщение");
         notificationOfMessageWithLinks.setSender(messageNotification.getSender().getId());
         notificationOfMessageWithLinks.setChatId(messageNotification.getLinkedMessage().getChat().getId());
