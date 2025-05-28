@@ -1,6 +1,6 @@
 package com.example.social_network01.service.chat_members;
 
-import com.example.social_network01.dto.ChatMemberDTO;
+import com.example.social_network01.dto.chat.ChatMemberDTO;
 
 import java.util.List;
 

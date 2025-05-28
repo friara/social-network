@@ -1,8 +1,5 @@
 package com.example.social_network01.dto.message;
 
-import com.example.social_network01.dto.ChatDTO;
-import com.example.social_network01.dto.FileDTO;
-import com.example.social_network01.dto.UserDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

@@ -1,6 +1,5 @@
-package com.example.social_network01.dto;
+package com.example.social_network01.dto.chat;
 
-import com.example.social_network01.model.ChatMember;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.LocalDateTime;

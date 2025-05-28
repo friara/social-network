@@ -1,9 +1,8 @@
-package com.example.social_network01.dto;
+package com.example.social_network01.dto.chat;
 
 import lombok.Data;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Data
 public class ChatSummaryDTO {

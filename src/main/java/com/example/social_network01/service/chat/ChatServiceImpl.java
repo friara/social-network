@@ -1,7 +1,7 @@
 package com.example.social_network01.service.chat;
 
-import com.example.social_network01.dto.ChatDTO;
-import com.example.social_network01.dto.ChatSummaryDTO;
+import com.example.social_network01.dto.chat.ChatDTO;
+import com.example.social_network01.dto.chat.ChatSummaryDTO;
 import com.example.social_network01.exception.custom.ResourceNotFoundException;
 import com.example.social_network01.exception.custom.UserNotFoundException;
 import com.example.social_network01.model.Chat;
@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service("chatService")
@@ -111,6 +113,125 @@ public class ChatServiceImpl implements ChatService {
     public Page<ChatSummaryDTO> getUserChats(Long userId, String search, Pageable pageable) {
         Page<Chat> chats = chatRepository.findUserChatsWithSearch(userId, search, pageable);
         return chats.map(c -> convertToSummaryDTO(c, userId));
+    }
+
+    @Override
+    public ChatDTO deleteParticipant(Long chatId, Long userId) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chat not found"));
+
+        // Запрет удаления в личных чатах
+        if (chat.getChatType() == Chat.ChatType.PRIVATE) {
+            throw new IllegalArgumentException("Forbidden to delete participants for personal chats");
+        }
+
+        // Поиск участника по userId
+        ChatMember memberToRemove = chat.getChatMembers().stream()
+                .filter(member -> member.getUser().getId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("User not found in the chat"));
+
+        // Запрет удаления создателя чата
+        if (chat.getCreatedBy().getId().equals(userId)) {
+            throw new IllegalArgumentException("Cannot remove the creator of the chat");
+        }
+
+        // Удаление участника
+        chat.getChatMembers().remove(memberToRemove);
+
+        return convertToDTO(chatRepository.save(chat), chat.getCreatedBy().getId());
+    }
+
+
+    @Override
+    @Transactional
+    public ChatDTO addParticipants(Long chatId, List<Long> userIds) {
+        // Проверка входных данных
+        if (userIds == null || userIds.isEmpty()) {
+            throw new IllegalArgumentException("User IDs list cannot be null or empty");
+        }
+
+        // Удаление дубликатов
+        List<Long> distinctUserIds = userIds.stream()
+                .distinct()
+                .collect(Collectors.toList());
+
+        // Поиск чата
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chat not found"));
+
+        // Проверка типа чата
+        if (chat.getChatType() != Chat.ChatType.GROUP) {
+            throw new IllegalArgumentException("Only group chats can have participants added");
+        }
+
+        // Получение существующих участников
+        Set<Long> existingMemberIds = chat.getChatMembers().stream()
+                .map(member -> member.getUser().getId())
+                .collect(Collectors.toSet());
+
+        // Загрузка пользователей
+        List<User> usersToAdd = userRepository.findAllById(distinctUserIds);
+
+        // Проверка существования всех пользователей
+        if (usersToAdd.size() != distinctUserIds.size()) {
+            Set<Long> foundIds = usersToAdd.stream()
+                    .map(User::getId)
+                    .collect(Collectors.toSet());
+
+            List<Long> missingIds = distinctUserIds.stream()
+                    .filter(id -> !foundIds.contains(id))
+                    .collect(Collectors.toList());
+
+            throw new ResourceNotFoundException("Users not found with IDs: " + missingIds);
+        }
+
+        // Создание новых участников
+        List<ChatMember> newMembers = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (User user : usersToAdd) {
+            Long userId = user.getId();
+
+            // Пропуск существующих участников
+            if (existingMemberIds.contains(userId)) {
+                continue;
+            }
+
+            // Пропуск создателя чата (если вдруг добавлен)
+            if (userId.equals(chat.getCreatedBy().getId())) {
+                continue;
+            }
+
+            ChatMember member = new ChatMember();
+            member.setChat(chat);
+            member.setUser(user);
+            member.setJoinedWhen(now);
+            newMembers.add(member);
+        }
+
+        // Добавление новых участников
+        if (!newMembers.isEmpty()) {
+            chat.getChatMembers().addAll(newMembers);
+            chatRepository.save(chat);
+        }
+
+        return convertToDTO(chat, chat.getCreatedBy().getId());
+    }
+
+    @Override
+    public ChatDTO updateChatName(Long chatId, String newName) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chat not found"));
+
+        // Запрет удаления в личных чатах
+        if (chat.getChatType() == Chat.ChatType.PRIVATE) {
+            throw new IllegalArgumentException("Forbidden to update name of personal chats");
+        }
+
+        chat.setChatName(newName);
+
+        return convertToDTO(chatRepository.save(chat), chat.getCreatedBy().getId());
     }
 
     private ChatSummaryDTO convertToSummaryDTO(Chat chat, Long userId) {

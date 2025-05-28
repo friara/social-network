@@ -2,8 +2,8 @@ package com.example.social_network01.config.mapping;
 
 import com.example.social_network01.dto.*;
 import com.example.social_network01.dto.booking.BookingDTO;
+import com.example.social_network01.dto.chat.ChatDTO;
 import com.example.social_network01.dto.message.MessageDTO;
-import com.example.social_network01.dto.message.MessageNotificationDTO;
 import com.example.social_network01.dto.post.PostResponseDTO;
 import com.example.social_network01.exception.custom.ResourceNotFoundException;
 import com.example.social_network01.model.*;
@@ -23,7 +23,6 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Configuration

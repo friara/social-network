@@ -1,4 +1,4 @@
-package com.example.social_network01.dto;
+package com.example.social_network01.dto.chat;
 
 import lombok.Data;
 
