@@ -40,17 +40,6 @@ public class FileServiceImpl implements FileService{
         this.modelMapper = modelMapper;
     }
 
-//    private void initModelMapperMappings() {
-//        modelMapper.typeMap(MultipartFile.class, File.class)
-//                .addMappings(mapper -> {
-//                    mapper.skip(File::setId);
-//                    mapper.skip(File::setUploadedWhen);
-//                    mapper.map(src -> src.getOriginalFilename(), File::setFileName);
-//                    mapper.map(src -> src.getSize(), File::setFileSize);
-//                    mapper.map(src -> src.getContentType(), File::setMimeType);
-//                });
-//    }
-
     @Transactional(readOnly = true)
     @Override
     public List<FileDTO> getAllFiles() {

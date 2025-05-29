@@ -20,14 +20,12 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     @Transactional(readOnly = true)
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
-        // 1. Извлеките данные из токена
+        // Извлекитекаем данные из токена
         String username = jwt.getClaim("sub");
-
-        // 2. Загрузите пользователя из БД
+        // Загружаем пользователя из БД
         User user = userRepository.findByLoginWithRole(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        // 3. Создайте объект аутентификации
+        // Создаем объект аутентификации
         return new UsernamePasswordAuthenticationToken(
                 user,
                 jwt,

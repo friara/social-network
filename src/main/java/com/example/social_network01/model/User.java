@@ -22,8 +22,6 @@ import java.util.List;
 
 @Schema(hidden = true)
 @Entity
-//@Cacheable
-//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Data
 @Table(name = "Users",
         uniqueConstraints = {
@@ -87,11 +85,7 @@ public class User implements UserDetails {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
-    //@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Role role;
-
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<UserDevice> devices;
 
     @JsonIgnore
     @ToString.Exclude

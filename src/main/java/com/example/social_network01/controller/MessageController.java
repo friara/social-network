@@ -47,44 +47,6 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getMessagesByChatId(chatId, pageable));
     }
 
-
-//    @Operation(summary = "Create message with files",
-//            description = "Create a new message in chat with optional file attachments")
-//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
-//    public ResponseEntity<MessageDTO> createMessage(
-//            @Parameter(description = "ID чата", required = true)
-//            @PathVariable Long chatId,
-//
-//            @Parameter(description = "Message data and files",
-//                    content = @Content(
-//                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-//                            schema = @Schema(implementation = MessageRequestDTO.class),
-//                            encoding = {
-//                                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE),
-//                                    @Encoding(name = "files", contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-//                            }
-//                    ))
-//            @Valid @RequestPart("request") MessageRequestDTO request,
-//
-//            @Parameter(description = "List of files to attach")
-//            @RequestPart(value = "files", required = false) List<MultipartFile> files,
-//
-//            @AuthenticationPrincipal User currentUser) {
-//
-//        // Привязываем файлы к DTO если они есть
-//        if (files != null && !files.isEmpty()) {
-//            request.setFiles(files);
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(messageService.createMessage(
-//                        chatId,
-//                        currentUser.getId(),
-//                        request
-//                ));
-//    }
-
     @PostMapping
     @PreAuthorize("@chatService.isUserParticipant(#chatId, #currentUser.id)")
     public ResponseEntity<MessageDTO> createMessage(

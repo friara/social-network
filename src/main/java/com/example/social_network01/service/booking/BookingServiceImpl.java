@@ -79,13 +79,7 @@ public class BookingServiceImpl implements BookingService {
                 .toInstant();
 
         return bookingRepository.findBookingsFromTodayByUser(user, startOfDay, pageable)
-                .map(booking -> {
-                    BookingDTO dto = modelMapper.map(booking, BookingDTO.class);
-//                    // Явно устанавливаем временную зону
-//                    dto.setBookingStart(booking.getBookingStart().atZone(ZoneOffset.UTC));
-//                    dto.setBookingEnd(booking.getBookingEnd().atZone(ZoneOffset.UTC));
-                    return dto;
-                });
+                .map(booking -> modelMapper.map(booking, BookingDTO.class));
     }
 
     @Override

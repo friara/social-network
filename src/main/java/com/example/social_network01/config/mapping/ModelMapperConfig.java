@@ -138,154 +138,9 @@ public class ModelMapperConfig {
                     mapper.map(src -> src.getChat().getId(), MessageDTO::setChatId);
                 });
 
-
-
-//        modelMapper.typeMap(MessageNotification.class, MessageNotificationDTO.class)
-//                .addMappings(mapper -> {
-//                    // Прямые маппинги
-//                    mapper.map(MessageNotification::getId, MessageNotificationDTO::setId);
-//                    mapper.map(MessageNotification::getCreatedAt, MessageNotificationDTO::setTimestamp);
-//
-//                    // Маппинг статуса на isRead с явным преобразованием
-//                    mapper.using((Converter<MessageNotification.NotificationStatus, Boolean>) ctx ->
-//                            ctx.getSource() == MessageNotification.NotificationStatus.READ
-//                    ).map(MessageNotification::getStatus, MessageNotificationDTO::setRead);
-//
-//                    // Формирование имени отправителя
-//                    mapper.using(ctx -> {
-//                        User sender = ((MessageNotification) ctx.getSource()).getSender();
-//                        return sender != null
-//                                ? sender.getFirstName() + " " + sender.getLastName()
-//                                : "Unknown";
-//                    }).map(MessageNotification::getSender, MessageNotificationDTO::setSender);
-//
-//                    // Логика для контента сообщения
-//                    mapper.using(ctx -> {
-//                        Message message = ((MessageNotification) ctx.getSource()).getLinkedMessage();
-//                        if (message == null) return "";
-//
-//                        return Optional.ofNullable(message.getText())
-//                                .filter(text -> !text.isEmpty())
-//                                .orElseGet(() -> Optional.ofNullable(message.getFiles())
-//                                        .filter(files -> !files.isEmpty())
-//                                        .map(files -> files.get(0).getFileName())
-//                                        .orElse("")
-//                                );
-//                    }).map(MessageNotification::getLinkedMessage, MessageNotificationDTO::setContent);
-//
-//                    // Информация о чате
-//                    mapper.using(ctx -> {
-//                        MessageNotification notification = (MessageNotification) ctx.getSource();
-//                        Message message = notification.getLinkedMessage();
-//                        if (message == null) return null;
-//
-//                        Chat chat = message.getChat();
-//                        if (chat == null) return null;
-//
-//                        if (chat.getChatType() == Chat.ChatType.PRIVATE) {
-//                            return chat.getChatMembers().stream()
-//                                    .map(ChatMember::getUser)
-//                                    .filter(user -> !user.equals(notification.getSender()))
-//                                    .findFirst()
-//                                    .map(user -> user.getFirstName() + " " + user.getLastName())
-//                                    .orElse("Private Chat");
-//                        }
-//                        return chat.getChatName();
-//                    }).map(MessageNotification::getLinkedMessage, MessageNotificationDTO::setChatName);
-//
-//                    // ID чата
-//                    mapper.using(ctx ->
-//                            Optional.ofNullable(((MessageNotification) ctx.getSource()).getLinkedMessage())
-//                                    .map(Message::getChat)
-//                                    .map(Chat::getId)
-//                                    .orElse(null)
-//                    ).map(MessageNotification::getLinkedMessage, MessageNotificationDTO::setChatId);
-//                });
-
-
-
-
-
-
-
-
-
-
-
         modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setSkipNullEnabled(true);
-
-
-
-
-
-
-
-//        modelMapper.typeMap(MessageNotification.class, MessageNotificationDTO.class)
-//                .addMappings(mapper -> {
-//                    // Прямые маппинги
-//                    mapper.map(MessageNotification::getId, MessageNotificationDTO::setId);
-//                    mapper.map(src -> src.getStatus() == MessageNotification.NotificationStatus.READ,
-//                            MessageNotificationDTO::setRead);
-//                    mapper.map(MessageNotification::getCreatedAt, MessageNotificationDTO::setTimestamp);
-//
-//                    // Отправитель
-//                    mapper.using(ctx -> {
-//                        User sender = ((MessageNotification) ctx.getSource()).getSender();
-//                        return sender != null
-//                                ? sender.getFirstName() + " " + sender.getLastName()
-//                                : "Unknown";
-//                    }).map(MessageNotification::getSender, MessageNotificationDTO::setSender);
-//
-//                    // Контент сообщения
-//                    mapper.using(ctx -> {
-//                        MessageNotification notification = (MessageNotification) ctx.getSource();
-//                        Message message = notification.getLinkedMessage();
-//                        if (message == null) return "";
-//
-//                        return Optional.ofNullable(message.getText())
-//                                .filter(text -> !text.isEmpty())
-//                                .orElseGet(() -> Optional.ofNullable(message.getFiles())
-//                                        .filter(files -> !files.isEmpty())
-//                                        .map(files -> files.get(0).getFileName())
-//                                        .orElse("")
-//                                );
-//                    }).map(MessageNotification::getLinkedMessage, MessageNotificationDTO::setContent);
-//
-//                    // Название чата
-//                    mapper.using(ctx -> {
-//                        MessageNotification notification = (MessageNotification) ctx.getSource();
-//                        Message message = notification.getLinkedMessage();
-//                        if (message == null) return null;
-//
-//                        Chat chat = message.getChat();
-//                        if (chat == null) return null;
-//
-//                        if (chat.getChatType() == Chat.ChatType.PRIVATE) {
-//                            return chat.getChatMembers().stream()
-//                                    .map(ChatMember::getUser)
-//                                    .filter(user -> !user.equals(notification.getSender()))
-//                                    .findFirst()
-//                                    .map(user -> user.getFirstName() + " " + user.getLastName())
-//                                    .orElse("Private Chat");
-//                        }
-//                        return chat.getChatName();
-//                    }).map(MessageNotification::getLinkedMessage, MessageNotificationDTO::setChatName);
-//
-//                    // ID чата
-//                    mapper.using(ctx -> {
-//                        MessageNotification notification = (MessageNotification) ctx.getSource();
-//                        return Optional.ofNullable(notification.getLinkedMessage())
-//                                .map(Message::getChat)
-//                                .map(Chat::getId)
-//                                .orElse(null);
-//                    }).map(MessageNotification::getLinkedMessage, MessageNotificationDTO::setChatId);
-//                });
-
-
-
-
 
         // Настройка маппинга для Chat
         modelMapper.typeMap(Chat.class, ChatDTO.class).addMappings(mapper -> {
@@ -360,7 +215,6 @@ public class ModelMapperConfig {
                                 : null;
                     }).map(CommentDTO::getAnswerToComm, Comment::setAnswerToComm);
                 });
-
 
 
         //modelMapper.validate();

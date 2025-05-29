@@ -8,7 +8,6 @@ import com.example.social_network01.exception.custom.UserNotFoundException;
 import com.example.social_network01.model.Chat;
 import com.example.social_network01.model.Message;
 import com.example.social_network01.model.User;
-import com.example.social_network01.model.events.NewMessageEvent;
 import com.example.social_network01.repository.ChatRepository;
 import com.example.social_network01.repository.MessageRepository;
 import com.example.social_network01.repository.UserRepository;
@@ -96,10 +95,6 @@ public class MessageServiceImpl implements MessageService {
             fileService.updateFiles(request.getFiles(), message);
         }
 
-//        // Обновление вложений
-//        if (request.getFiles() != null) {
-//            fileService.updateFiles(request.getFiles(), message);
-//        }
         Message savedMessage = new Message();
         if((message.getText() == null || message.getText().isEmpty()) && (message.getFiles() == null || message.getFiles().isEmpty())) {
             deleteMessage(message.getChat().getId(), message.getId());

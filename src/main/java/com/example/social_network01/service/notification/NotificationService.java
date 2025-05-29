@@ -77,38 +77,6 @@ public class NotificationService {
         return notificationOfMessageWithLinks;
     }
 
-//    // Получение уведомлений
-//    @Transactional(readOnly = true)
-//    public List<MessageNotificationDTO> getUserNotifications(User user, int limit) {
-//        List<MessageNotification> notifications = notificationRepository.findByRecipientAndStatusOrderByCreatedAtDesc(
-//                user,
-//                PageRequest.of(0, limit),
-//                MessageNotification.NotificationStatus.UNREAD);
-//
-//        return notifications.stream()
-//                .map(messageNotification -> modelMapper.map(messageNotification, MessageNotificationDTO.class))
-//                .collect(Collectors.toList());
-//    }
-
-//    @Transactional(readOnly = true)
-//    public List<MessageNotificationDTO> getUserNotifications(User user, int limit) {
-//        // Используйте JOIN FETCH для инициализации связанных сущностей
-//        List<MessageNotification> notifications = notificationRepository.findByRecipientAndStatusOrderByCreatedAtDesc(
-//                user,
-//                PageRequest.of(0, limit),
-//                MessageNotification.NotificationStatus.UNREAD
-//        );
-//
-//        return notifications.stream()
-//                .map(notification -> {
-//                    // Инициализация прокси перед маппингом
-//                    Hibernate.initialize(notification.getLinkedMessage());
-//                    Hibernate.initialize(notification.getSender());
-//                    return modelMapper.map(notification, MessageNotificationDTO.class);
-//                })
-//                .collect(Collectors.toList());
-//    }
-
     @Transactional
     public void markAsRead(Long notificationId) {
         notificationRepository.updateStatus(

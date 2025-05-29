@@ -6,11 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface MessageService {
-//    MessageDTO createMessage(String text, User user, Chat chat, List<MultipartFile> files);
-//    List<MessageDTO> getAllMessages();
     MessageDTO getMessageById(Long id);
-//    void deleteMessage(Long id);
-//    MessageDTO updateMessage(Long id, String newText, List<MultipartFile> newFiles);
     Page<MessageDTO> getMessagesByChatId(Long chatId, Pageable pageable);
     MessageDTO createMessage(Long chatId, Long userId, MessageRequestDTO request);
     MessageDTO updateMessage(Long messageId, Long userId, MessageRequestDTO request);

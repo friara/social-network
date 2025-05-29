@@ -16,24 +16,6 @@ import org.springframework.stereotype.Component;
 public class SubscriptionInterceptor implements ChannelInterceptor {
     private final ChatMemberRepository chatMemberRepository;
 
-//    @Override
-//    public Message<?> preSend(Message<?> message, MessageChannel channel) {
-//        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-//
-//        if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-//            String destination = accessor.getDestination();
-//            User user = (User) accessor.getUser();
-//
-//            if (destination.startsWith("/user/queue/messages")) {
-//                Long chatId = extractChatId(destination);
-//                if (!chatMemberRepository.existsByChatIdAndUserId(chatId, user.getId())) {
-//                    throw new AccessDeniedException("Access denied");
-//                }
-//            }
-//        }
-//        return message;
-//    }
-
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         return message; // Пропускаем все подписки без проверок

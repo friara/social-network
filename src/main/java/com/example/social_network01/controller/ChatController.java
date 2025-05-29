@@ -34,15 +34,15 @@ public class ChatController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChat);
     }
 
-//    @PutMapping("/{id}")
-//    @PreAuthorize("@chatService.isChatCreator(#id, #currentUser.id)")
-//    public ResponseEntity<ChatDTO> updateChat(
-//            @PathVariable Long id,
-//            @RequestBody @Valid ChatDTO chatDTO,
-//            @AuthenticationPrincipal User currentUser) {
-//        ChatDTO updatedChat = chatService.updateChat(id, chatDTO, currentUser);
-//        return ResponseEntity.ok(updatedChat);
-//    }
+    @PutMapping("/{id}")
+    @PreAuthorize("@chatService.isChatCreator(#id, #currentUser.id)")
+    public ResponseEntity<ChatDTO> updateChat(
+            @PathVariable Long id,
+            @RequestBody @Valid ChatDTO chatDTO,
+            @AuthenticationPrincipal User currentUser) {
+        ChatDTO updatedChat = chatService.updateChat(id, chatDTO, currentUser);
+        return ResponseEntity.ok(updatedChat);
+    }
 
     // Добавление участников в чат
     @PostMapping("/{chatId}/participants")
@@ -65,6 +65,16 @@ public class ChatController {
             @AuthenticationPrincipal User currentUser) {
 
         ChatDTO updatedChat = chatService.deleteParticipant(chatId, userId);
+        return ResponseEntity.ok(updatedChat);
+    }
+
+    // Выход участника из чата
+    @DeleteMapping("/{chatId}/exit")
+    public ResponseEntity<ChatDTO> exitFromChat(
+            @PathVariable Long chatId,
+            @AuthenticationPrincipal User currentUser) {
+
+        ChatDTO updatedChat = chatService.deleteParticipant(chatId, currentUser.getId());
         return ResponseEntity.ok(updatedChat);
     }
 

@@ -155,7 +155,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         user.setIsDeleted(true);
         userRepository.save(user);
-//        userRepository.deleteById(id);
     }
 
     @Transactional

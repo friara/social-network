@@ -120,11 +120,6 @@ public class ChatServiceImpl implements ChatService {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ResourceNotFoundException("Chat not found"));
 
-        // Запрет удаления в личных чатах
-        if (chat.getChatType() == Chat.ChatType.PRIVATE) {
-            throw new IllegalArgumentException("Forbidden to delete participants for personal chats");
-        }
-
         // Поиск участника по userId
         ChatMember memberToRemove = chat.getChatMembers().stream()
                 .filter(member -> member.getUser().getId().equals(userId))
@@ -132,12 +127,18 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found in the chat"));
 
         // Запрет удаления создателя чата
-        if (chat.getCreatedBy().getId().equals(userId)) {
-            throw new IllegalArgumentException("Cannot remove the creator of the chat");
+        if (chat.getCreatedBy().getId().equals(userId) && chat.getChatType() == Chat.ChatType.GROUP) {
+            chatRepository.delete(chat); // Удаление всего чата из БД
+            return null; // Возвращаем null как индикатор удаления чата
         }
 
         // Удаление участника
         chat.getChatMembers().remove(memberToRemove);
+
+        if(chat.getChatMembers().isEmpty()) {
+            chatRepository.delete(chat); // Удаление всего чата из БД
+            return null; // Возвращаем null как индикатор удаления чата
+        }
 
         return convertToDTO(chatRepository.save(chat), chat.getCreatedBy().getId());
     }
