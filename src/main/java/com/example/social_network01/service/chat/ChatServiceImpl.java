@@ -255,7 +255,7 @@ public class ChatServiceImpl implements ChatService {
                     .filter(user -> !user.getId().equals(userId))
                     .findFirst()
                     .map(user -> user.getFirstName() + " " + user.getLastName())
-                    .orElse("Удаленный чат");
+                    .orElse("Unknown User");
             dto.setChatName(otherUserFio);
         }
 
@@ -272,7 +272,7 @@ public class ChatServiceImpl implements ChatService {
                     .filter(user -> !user.getId().equals(userId))
                     .findFirst()
                     .map(user -> user.getFirstName() + " " + user.getLastName())
-                    .orElse("Удаленный чат");
+                    .orElse("Unknown User");
             dto.setChatName(otherUserFio);
         }
 
